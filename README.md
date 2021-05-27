@@ -48,7 +48,7 @@ directory and follow the pattern `test_*.py`. For more info on writing tests,
 please see [this guide](https://flask.palletsprojects.com/en/2.0.x/tutorial/tests/).
    
 8. Submit a pull request to merge your changes into the main branch when you are ready! Make sure to request a review and
-make sure that your unit tests are passing.
+make sure that your unit tests are passing. New comits should trigger the GitHub testing workflow to run, so check the "Actions" panel to see if it is passing.
 
 Finally, the source data can be found here:
 
