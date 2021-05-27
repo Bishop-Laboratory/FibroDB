@@ -1,0 +1,4 @@
+include fibrodb/schema.sql
+graft fibrodb/static
+graft fibrodb/templates
+global-exclude *.pyc
