@@ -15,8 +15,8 @@ git clone https://github.com/Bishop-Laboratory/Fibroblast-lncRNASeq-explorer.git
 
 ```shell
 cd Fibroblast-lncRNASeq-explorer/
-pip install venv
-source venv/bin/activate
+python3 -m venv env
+source env/bin/activate
 pip install -r requirements.txt
 ```
 
