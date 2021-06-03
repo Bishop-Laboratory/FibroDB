@@ -57,12 +57,6 @@ make sure that your unit tests are passing. New comits should trigger the GitHub
 
 Finally, the source data can be found here:
 
-https://www.dropbox.com/t/h1n4gOsV8tD4cnQ3
-
-https://www.dropbox.com/t/rH6iCwal5YvUjHg1
-
-https://www.dropbox.com/t/ShfrDJbtiBR64k1q
-
-https://www.dropbox.com/t/49xanARJVYJADm45
+https://uthscsa.box.com/s/lgcymxl0jef9wnmvqpvd9v3ih8820ti6
 
 And the manuscript is here: https://uthscsa.box.com/s/b1hg9urz7dollxkpisgcyfih0l9djm1v
