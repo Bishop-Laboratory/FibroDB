@@ -59,8 +59,8 @@ please see [this guide](https://flask.palletsprojects.com/en/2.0.x/tutorial/test
 8. Submit a pull request to merge your changes into the main branch when you are ready! Make sure to request a review and
 make sure that your unit tests are passing. New comits should trigger the GitHub testing workflow to run, so check the "Actions" panel to see if it is passing.
 
-Finally, the source data can be found here:
+Finally, the source data can be found here: https://uthscsa.box.com/s/lgcymxl0jef9wnmvqpvd9v3ih8820ti6
 
-https://uthscsa.box.com/s/lgcymxl0jef9wnmvqpvd9v3ih8820ti6
+Here is the direct link on AWS: https://fibrodb-data.s3-us-west-2.amazonaws.com/Fibroblast-Fibrosis.zip
 
 And the manuscript is here: https://uthscsa.box.com/s/b1hg9urz7dollxkpisgcyfih0l9djm1v
