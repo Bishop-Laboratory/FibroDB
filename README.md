@@ -15,18 +15,13 @@ git clone https://github.com/Bishop-Laboratory/Fibroblast-lncRNASeq-explorer.git
 
 ```shell
 cd Fibroblast-lncRNASeq-explorer/
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
-pip install node-env
-nodeenv --python-virtualenv
-deactivate
-source env/bin/activate
+bash install.sh
 ```
 
 3. Run the app
 
 ```shell
+source env/bin/activate
 pip install -e .
 export FLASK_APP=fibrodb
 export FLASK_ENV=development
