@@ -2,6 +2,7 @@ atomicwrites==1.4.0
 attrs==21.2.0
 click==8.0.1
 colorama==0.4.4
+coverage==5.5
 Flask==2.0.1
 Flask-SQLAlchemy==2.5.1
 greenlet==1.1.0
