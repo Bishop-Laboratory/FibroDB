@@ -32,12 +32,30 @@ def get_db():
 
     return g.db
 
+def download_data(url):
+    """
+    Downloads zip file from given url, unzips it and saves unzipped content to 'data' directory
+    """
+    from io import BytesIO
+    from urllib.request import urlopen
+    from zipfile import ZipFile
+    import os
+    zipurl = url
+    print(os.getcwd())
+    with urlopen(zipurl) as zipresp:
+        print("[+] Opening ZIP file")
+        with ZipFile(BytesIO(zipresp.read())) as zfile:
+            print("[+] Reading ZIP file")
+            zfile.extractall(f'data')
+            print("[+] ZIP file extracted to 'data' directory")
 
 def load_db(db):
-    # TODO: Needs function for loading DB with datasets from AWS
+    """
+    Calls download_data() to get data and loads data into DB.
+    """
+    download_data('https://fibrodb-data.s3-us-west-2.amazonaws.com/Fibroblast-Fibrosis.zip')
 
     return db
-
 
 def close_db(e=None):
     db = g.pop('db', None)
