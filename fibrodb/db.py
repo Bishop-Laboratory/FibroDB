@@ -55,7 +55,7 @@ def load_db(db):
     """
     download_data('https://fibrodb-data.s3-us-west-2.amazonaws.com/Fibroblast-Fibrosis.zip')
 
-    return db
+    # return db
 
 def close_db(e=None):
     db = g.pop('db', None)
