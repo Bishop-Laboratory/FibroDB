@@ -10,6 +10,7 @@ deactivate
 source env/bin/activate
 pip install -e .
 pip install -e search
-pushd search 
+pwd
+pushd ./search 
 npm install
 popd
