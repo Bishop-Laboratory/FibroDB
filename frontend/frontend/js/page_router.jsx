@@ -6,7 +6,7 @@ import {
     Link
   } from "react-router-dom";
   import {Menu} from './components/pageview.jsx';
-
+  import Plot from 'react-plotly.js';
 
   export default function App() {
     return (
@@ -51,5 +51,20 @@ import {
   }
   
   function Search() {
-    return <h2>Search</h2>;
+    return <div>
+        <h2>Search</h2>
+      <Plot
+        data={[
+          {
+            x: [1, 2, 3],
+            y: [2, 6, 3],
+            type: 'scatter',
+            mode: 'lines+markers',
+            marker: {color: 'red'},
+          },
+          {type: 'bar', x: [1, 2, 3], y: [2, 5, 3]},
+        ]}
+        layout={ {width: 320, height: 240, title: 'A Fancy Plot'} }
+      />
+    </div>;
   }
