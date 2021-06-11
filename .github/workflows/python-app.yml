@@ -30,5 +30,6 @@ jobs:
     - name: Test with coverage + pytest
       run: |
         source env/bin/activate
+        pip freeze
         coverage run -m pytest
         coverage report -m
