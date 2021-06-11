@@ -11,4 +11,4 @@ pip install -e .
 pip install -e search
 pushd search 
 npm install
-popd search
+popd
