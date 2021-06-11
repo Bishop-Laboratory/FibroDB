@@ -9,8 +9,7 @@ nodeenv --python-virtualenv
 deactivate
 source env/bin/activate
 pip install -e .
-pip install -e search
-pwd
-pushd ./search 
+pip install -e frontend
+pushd frontend
 npm install
 popd
