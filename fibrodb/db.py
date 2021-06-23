@@ -42,12 +42,12 @@ def download_data(url):
     import os
     zipurl = url
     print(os.getcwd())
+    print("[+] Opening ZIP file")
     with urlopen(zipurl) as zipresp:
-        print("[+] Opening ZIP file")
+        print("[+] Reading ZIP file")
         with ZipFile(BytesIO(zipresp.read())) as zfile:
-            print("[+] Reading ZIP file")
-            zfile.extractall(f'data')
             print("[+] ZIP file extracted to 'data' directory")
+            zfile.extractall(f'data')
 
 def load_db(db):
     """
@@ -55,6 +55,7 @@ def load_db(db):
     """
     download_data('https://fibrodb-data.s3-us-west-2.amazonaws.com/Fibroblast-Fibrosis.zip')
 
+    ## Add code for data munging into DB here
     # return db
 
 def close_db(e=None):
