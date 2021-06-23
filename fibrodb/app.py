@@ -6,10 +6,16 @@ import os
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join(app.instance_path, 'fibrodb.sqlite')
-print(app.config['SQLALCHEMY_DATABASE_URI'])
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join(app.instance_path, 'fibrodb.sqlite')
+app.config['SQLALCHEMY_DATABASE_URI']  = 'sqlite:///fibrodb.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+print('[+] DB PATH:    ',app.config['SQLALCHEMY_DATABASE_URI'])
 
 db = SQLAlchemy(app)
+
+@app.route("/")
+def landing_page():
+    return "FIBRO DB UNDER CONSTRUCTION!"
 
 # print(db.Model.metadata.reflect(db.engine))
 
@@ -66,7 +72,7 @@ class GeneExp(db.Model):
 class Degs(db.Model):
     __tablename__ = 'degs'
     degs_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    gene_id = db.Column(db.TInteger, db.ForeignKey('genes.gene_id'), nullable=False)
+    gene_id = db.Column(db.Integer, db.ForeignKey('genes.gene_id'), nullable=False)
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.sample_id'), nullable=False)
     log2fc = db.Column(db.Numeric)
     pval = db.Column(db.Numeric)
@@ -80,3 +86,6 @@ class Degs(db.Model):
         self.pval = pval
         self.padj = padj
 
+if __name__ == "__main__":
+    db.create_all()
+    app.run(debug=True)
