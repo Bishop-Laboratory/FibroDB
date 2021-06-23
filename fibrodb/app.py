@@ -22,6 +22,13 @@ class Samples(db.Model):
     study_info = db.Column(db.Text)
     sample_name = db.Column(db.Text, unique=True, nullable=False)
 
+    def __init__(self, sample_id, study, study_info, sample_name):
+        self.sample_id = sample_id
+        self.study = study
+        self.study_info = study_info
+        self.sample_name = sample_name
+
+
 class Genes(db.Model):
     __tablename__ = 'genes'
     gene_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -29,6 +36,14 @@ class Genes(db.Model):
     gene_symbol = db.Column(db.Text)
     gene_biotype = db.Column(db.Text)
     gene_location = db.Column(db.Text)
+
+    def __init__(self, gene_id, ensemble_id, gene_symbol, gene_biotype, gene_location):
+        self.gene_id = gene_id
+        self. ensemble_id = ensemble_id
+        self.gene_symbol = gene_symbol
+        self.gene_biotype = gene_biotype
+        self.gene_location = gene_location
+
 
 class GeneExp(db.Model):
     __tablename__ = 'gene_exp'
@@ -38,7 +53,15 @@ class GeneExp(db.Model):
     counts = db.Column(db.Numeric)
     cpm = db.Column(db.Numeric)
     rpkm = db.Column(db.Numeric)
-    cpm = db.Column(db.Numeric)
+
+    def __init__(self, expression_id, gene_id, sample, counts, cpm, rpkm):
+        self.expression_id = expression_id
+        self.gene_id = gene_id
+        self.sample = sample
+        self. counts = counts
+        self.cpm = cpm
+        self.rpkm = rpkm
+
 
 class Degs(db.Model):
     __tablename__ = 'degs'
@@ -48,4 +71,12 @@ class Degs(db.Model):
     log2fc = db.Column(db.Numeric)
     pval = db.Column(db.Numeric)
     padj = db.Column(db.Numeric)
+
+    def __init__(self, degs_id, gene_id, sample_id, log2fc, pval, padj):
+        self.degs_id = degs_id
+        self.gene_id = gene_id
+        self.sample_id = sample_id
+        self.log2fc = log2fc
+        self.pval = pval
+        self.padj = padj
 
