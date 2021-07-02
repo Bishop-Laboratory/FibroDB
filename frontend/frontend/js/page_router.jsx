@@ -7,7 +7,8 @@ import {
   } from "react-router-dom";
   import {Menu} from './components/pageview.jsx';
   import Plot from 'react-plotly.js';
-
+  import Volcano from './volcanoplot.jsx';
+  import SearchForm from './SearchForm.jsx';
   export default function App() {
     return (
       <Router>
@@ -15,7 +16,7 @@ import {
           <nav>
             <Menu>
               <div>
-                <Link to="/">Home</Link>
+                <Link to="/">Home2</Link>
               </div>
               <div>
                 <Link to="/search-genes">Search-Genes</Link>
@@ -43,7 +44,7 @@ import {
   }
   
   function Home() {
-    return <h2>Home</h2>;
+    return <div><h2>Home</h2><SearchForm/></div>;
   }
   
   function About() {
@@ -53,18 +54,6 @@ import {
   function Search() {
     return <div>
         <h2>Search</h2>
-      <Plot
-        data={[
-          {
-            x: [1, 2, 3],
-            y: [2, 6, 3],
-            type: 'scatter',
-            mode: 'lines+markers',
-            marker: {color: 'red'},
-          },
-          {type: 'bar', x: [1, 2, 3], y: [2, 5, 3]},
-        ]}
-        layout={ {width: 320, height: 240, title: 'A Fancy Plot'} }
-      />
+      <Volcano/>
     </div>;
   }
