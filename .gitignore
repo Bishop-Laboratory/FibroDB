@@ -16,3 +16,6 @@ build/
 *.egg-info/
 
 frontend/node_modules/
+.Rproj.user
+*.Rproj
+.Rhistory
