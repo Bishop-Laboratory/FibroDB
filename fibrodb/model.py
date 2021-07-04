@@ -1,24 +1,7 @@
-# app.py
-from flask import Flask
-from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
-import os
 
-app = Flask(__name__)
+db = SQLAlchemy()
 
-app.config['SQLALCHEMY_DATABASE_URI']  = 'sqlite:///fibrodb.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-# print('[+] DB PATH:\t',app.config['SQLALCHEMY_DATABASE_URI'])  ##uncomment for debugging
-
-db = SQLAlchemy(app)
-
-@app.route("/")
-def landing_page():
-    return "FIBRO DB UNDER CONSTRUCTION!"
-
-# print(db.Model.metadata.reflect(db.engine))
-
-# print(dir(db))
 
 class Samples(db.Model):
     __tablename__ = 'samples'
@@ -42,25 +25,25 @@ class Samples(db.Model):
         self.study_info = study_info
 
 
-
 class Genes(db.Model):
     __tablename__ = 'genes'
     gene_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ensemble_id = db.Column(db.Text, unique=True, nullable=False)
     gene_symbol = db.Column(db.Text)
     gene_biotype = db.Column(db.Text)
-    chromosome = db.Column(db.Text)
-    chr_start = db.Column(db.Integer)
-    chr_end = db.Column(db.Integer)
+    seqnames = db.Column(db.Text)
+    start = db.Column(db.Integer)
+    end = db.Column(db.Integer)
 
-    def __init__(self, gene_id, ensemble_id, gene_symbol, gene_biotype, chromosome, chr_start, chr_end):
+    def __init__(self, gene_id, ensemble_id, gene_symbol,
+                 gene_biotype, seqnames, start, end):
         self.gene_id = gene_id
-        self. ensemble_id = ensemble_id
+        self.ensemble_id = ensemble_id
         self.gene_symbol = gene_symbol
         self.gene_biotype = gene_biotype
-        self.chromosome = gene_chromosome
-        self.chr_start = chr_start
-        self.chr_end = chr_end
+        self.seqnames = seqnames
+        self.start = start
+        self.end = end
 
 
 class GeneExp(db.Model):
@@ -71,17 +54,19 @@ class GeneExp(db.Model):
     raw_counts = db.Column(db.Numeric)
     cpm = db.Column(db.Numeric)
     rpkm = db.Column(db.Numeric)
+    tpm = db.Column(db.Numeric)
 
-    def __init__(self, expression_id, gene_id, sample_id, raw_counts, cpm, rpkm):
+    def __init__(self, expression_id, gene_id, sample_id, raw_counts, cpm, rpkm, tpm):
         self.expression_id = expression_id
         self.gene_id = gene_id
         self.sample_id = sample_id
         self.raw_counts = raw_counts
         self.cpm = cpm
         self.rpkm = rpkm
+        self.tpm = tpm
 
 
-class Degs(db.Model):
+class DEGs(db.Model):
     __tablename__ = 'degs'
     degs_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     gene_id = db.Column(db.Integer, db.ForeignKey('genes.gene_id'), nullable=False)
@@ -93,14 +78,7 @@ class Degs(db.Model):
     def __init__(self, degs_id, gene_id, study_id, log2fc, pval, padj):
         self.degs_id = degs_id
         self.gene_id = gene_id
-        self.sample_id = sample_id
+        self.study_id = study_id
         self.log2fc = log2fc
         self.pval = pval
         self.padj = padj
-
-if __name__ == "__main__":
-    # delete all tables in database to upload 'fresh' data
-    db.drop_all()
-    # create tables initiated above
-    db.create_all()
-    app.run(debug=True)
