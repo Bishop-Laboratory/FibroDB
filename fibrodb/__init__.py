@@ -20,13 +20,19 @@ def create_app(test_config=None):
         pass
 
     # Init database with app
-    from fibrodb.model import db
+    from fibrodb.model import db, ma
     db.init_app(app)
 
     # Clean the database and load it
-    from fibrodb.db import clean_init_db
+    from fibrodb.db import clean_init_db, load_db
     with app.app_context():
         clean_init_db(db)
+        load_db(db)
+        ma.init_app(app)
+
+    # Import the webui blueprint
+    from fibrodb import api
+    app.register_blueprint(api.bp)
 
     # For testing
     @app.route("/hello")

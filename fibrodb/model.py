@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 db = SQLAlchemy()
+ma = Marshmallow()
 
 
 class Samples(db.Model):
@@ -14,15 +16,10 @@ class Samples(db.Model):
     timepoint = db.Column(db.Text)
     treatment = db.Column(db.Text)
 
-    def __init__(self, sample_id, study_id, study_info, condition, replicate, tissue, timepoint, treatment):
-        self.sampleID = sample_id
-        self.studyID = study_id
-        self.condition = condition
-        self.replicate = replicate
-        self.tissue = tissue
-        self.timepoint = timepoint
-        self.treatment = treatment
-        self.study_info = study_info
+
+class SamplesSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Samples
 
 
 class Genes(db.Model):
@@ -35,15 +32,10 @@ class Genes(db.Model):
     start = db.Column(db.Integer)
     end = db.Column(db.Integer)
 
-    def __init__(self, gene_id, ensemble_id, gene_symbol,
-                 gene_biotype, seqnames, start, end):
-        self.gene_id = gene_id
-        self.ensemble_id = ensemble_id
-        self.gene_symbol = gene_symbol
-        self.gene_biotype = gene_biotype
-        self.seqnames = seqnames
-        self.start = start
-        self.end = end
+
+class GenesSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Genes
 
 
 class GeneExp(db.Model):
@@ -56,14 +48,10 @@ class GeneExp(db.Model):
     rpkm = db.Column(db.Numeric)
     tpm = db.Column(db.Numeric)
 
-    def __init__(self, expression_id, gene_id, sample_id, raw_counts, cpm, rpkm, tpm):
-        self.expression_id = expression_id
-        self.gene_id = gene_id
-        self.sample_id = sample_id
-        self.raw_counts = raw_counts
-        self.cpm = cpm
-        self.rpkm = rpkm
-        self.tpm = tpm
+
+class GeneExpSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = GeneExp
 
 
 class DEGs(db.Model):
@@ -75,10 +63,7 @@ class DEGs(db.Model):
     pval = db.Column(db.Numeric)
     padj = db.Column(db.Numeric)
 
-    def __init__(self, degs_id, gene_id, study_id, log2fc, pval, padj):
-        self.degs_id = degs_id
-        self.gene_id = gene_id
-        self.study_id = study_id
-        self.log2fc = log2fc
-        self.pval = pval
-        self.padj = padj
+
+class DEGsSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = DEGs
