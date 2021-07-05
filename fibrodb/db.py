@@ -1,4 +1,9 @@
-from fibrodb.model import Genes, GeneExp, DEGs, Samples
+import numpy
+
+from fibrodb.model import Genes, GeneAliases, GeneExp, DEGs, Samples
+import pandas as pd
+import os
+import numpy as np
 
 
 def clean_init_db(db):
@@ -9,35 +14,18 @@ def clean_init_db(db):
 
 def load_db(db):
     """Load all data into the db"""
-    # TODO: Replace with real data loading function
-    load_test_data(db)
+    load_test_data(db)  # TODO: Finish replacing with real data loading function
+
+    # Load the gene datasets
+    files = np.array([ind if ind[-3:] == ".xz" else np.NaN for ind in os.listdir("fibrodb/misc/gene_data")])
+    datasets = files[np.where(files != str(np.NaN))]
+    if 'genes.csv.xz' in datasets:
+        print("LOADING GENES!!!!")
+        genes = pd.read_csv('fibrodb/misc/gene_data/genes.csv.xz')
+        genes.to_sql(name='genes', con=db.engine, if_exists="append", index=False)
 
 
 def load_test_data(db):
-    """Loads test data into db -- temporary usage while developing"""
-    # Test data add Genes
-    gene = Genes(
-        gene_id="ENSG00000141510", gene_biotype="Protein coding",
-        description="tumor protein 53",
-        gene_symbol="TP53", seqnames="Chr17", start=7661779, end=7687538
-    )
-    db.session.add(gene)
-    db.session.commit()
-    gene = Genes(
-        gene_id="ENSG00000012048", gene_biotype="Protein coding",
-        description="BRCA1 DNA repair associated",
-        gene_symbol="BRCA1", seqnames="Chr17", start=43044295, end=43170245
-    )
-    db.session.add(gene)
-    db.session.commit()
-    gene = Genes(
-        gene_id="ENSG00000245532", gene_biotype="lncRNA",
-        description="nuclear paraspeckle assembly transcript 1",
-        gene_symbol="NEAT1", seqnames="Chr11", start=65422774, end=65445540
-    )
-    db.session.add(gene)
-    db.session.commit()
-
     # Test data add Samples
     sample = Samples(
         sample_id="SRX10300304",
