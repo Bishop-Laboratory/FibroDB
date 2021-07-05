@@ -26,12 +26,25 @@ class Genes(db.Model):
     __tablename__ = 'genes'
     gene_id = db.Column(db.Text, primary_key=True)
     gene_symbol = db.Column(db.Text)
+    description = db.Column(db.Text)
     gene_biotype = db.Column(db.Text)
 
 
 class GenesSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Genes
+
+        
+class GeneAliases(db.Model):
+    __tablename__ = 'gene_aliases'
+    alias_symbol = db.Column(db.Text, primary_key=True)
+    gene_id = db.Column(db.Text, db.ForeignKey('genes.gene_id'), nullable=False)
+
+
+class GeneAliasesSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = GeneAliases
+        include_fk = True
 
 
 class GeneExp(db.Model):
