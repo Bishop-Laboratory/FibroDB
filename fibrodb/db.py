@@ -16,13 +16,25 @@ def load_db(db):
     """Load all data into the db"""
     load_test_data(db)  # TODO: Finish replacing with real data loading function
 
-    # Load the gene datasets
+    # Load gene datasets
+    load_gene_data(db)
+
+
+def load_gene_data(db):
+    """Load the gene info tables into the database"""
+    # Find the gene datasets
     files = np.array([ind if ind[-3:] == ".xz" else np.NaN for ind in os.listdir("fibrodb/misc/gene_data")])
     datasets = files[np.where(files != str(np.NaN))]
+
+    # Load the gene info data
     if 'genes.csv.xz' in datasets:
-        print("LOADING GENES!!!!")
         genes = pd.read_csv('fibrodb/misc/gene_data/genes.csv.xz')
         genes.to_sql(name='genes', con=db.engine, if_exists="append", index=False)
+
+    # Load the gene alias data
+    if 'gene_aliases.csv.xz' in datasets:
+        genes = pd.read_csv('fibrodb/misc/gene_data/gene_aliases.csv.xz')
+        genes.to_sql(name='gene_aliases', con=db.engine, if_exists="append", index=False)
 
 
 def load_test_data(db):

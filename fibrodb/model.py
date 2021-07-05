@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from marshmallow import Schema, fields
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -37,7 +38,8 @@ class GenesSchema(ma.SQLAlchemyAutoSchema):
         
 class GeneAliases(db.Model):
     __tablename__ = 'gene_aliases'
-    alias_symbol = db.Column(db.Text, primary_key=True)
+    alias_id = db.Column(db.Integer, primary_key=True)
+    alias_symbol = db.Column(db.Text)
     gene_id = db.Column(db.Text, db.ForeignKey('genes.gene_id'), nullable=False)
 
 

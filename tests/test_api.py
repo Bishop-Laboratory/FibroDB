@@ -9,17 +9,18 @@ def test_gene_info_1(client):
 
 
 def test_gene_info_2(client):
-    """Test gene info endpoint. Query by gene biotype and seqnames"""
-    response = client.get('/api-v1/gene-info?gene_biotype=Protein coding&seqnames=Chr17')
-    resdict = json.loads(response.data)[0]
-    assert resdict['gene_symbol'] == "TP53"
-
-
-def test_gene_info_3(client):
     """Test gene info endpoint. Query by gene symbol"""
     response = client.get('/api-v1/gene-info?gene_symbol=NEAT1')
     resdict = json.loads(response.data)[0]
     assert resdict['gene_id'] == "ENSG00000245532"
+
+
+def test_gene_alias(client):
+    """Test gene alias endpoint. Query by alias"""
+    response = client.get('/api-v1/gene-aliases?alias_symbol=P16')
+    resdict = json.loads(response.data)
+    genes = [entry['gene_id'] for entry in resdict]
+    assert "ENSG00000147889" in genes
 
 
 def test_gene_expression_1(client):

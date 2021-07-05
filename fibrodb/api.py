@@ -1,5 +1,6 @@
 from fibrodb.model import (
     Genes, GenesSchema,
+    GeneAliases, GeneAliasesSchema,
     DEGs, DEGsSchema,
     Samples, SamplesSchema,
     GeneExp, GeneExpSchema
@@ -11,6 +12,7 @@ bp = Blueprint('api', __name__)
 
 # Init marshmallow schemas
 genes_schema = GenesSchema(many=True)
+gene_aliases_schema = GeneAliasesSchema(many=True)
 degs_schema = DEGsSchema(many=True)
 samples_schema = SamplesSchema(many=True)
 geneexp_schema = GeneExpSchema(many=True)
@@ -20,8 +22,14 @@ geneexp_schema = GeneExpSchema(many=True)
 def gene_info_api():
     """API resource - Query genes by any column"""
     genes = Genes.query.filter_by(**request.args.to_dict()).all()
-    # return jsonify(genes_schema.dump(genes))
     return genes_schema.dumps(genes)
+
+
+@bp.route('/api-v1/gene-aliases', methods=('GET',))
+def gene_alias_api():
+    """API resource - Query genes by any column"""
+    gene_aliases = GeneAliases.query.filter_by(**request.args.to_dict()).all()
+    return gene_aliases_schema.dumps(gene_aliases)
 
 
 @bp.route('/api-v1/samples', methods=('GET',))
