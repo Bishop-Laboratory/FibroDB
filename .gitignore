@@ -18,4 +18,8 @@ build/
 
 *.db
 .Rproj.user
+
+frontend/node_modules/
+.Rproj.user
+*.Rproj
 .Rhistory
