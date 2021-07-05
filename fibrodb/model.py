@@ -26,11 +26,7 @@ class Genes(db.Model):
     __tablename__ = 'genes'
     gene_id = db.Column(db.Text, primary_key=True)
     gene_symbol = db.Column(db.Text)
-    description = db.Column(db.Text)
     gene_biotype = db.Column(db.Text)
-    seqnames = db.Column(db.Text)
-    start = db.Column(db.Integer)
-    end = db.Column(db.Integer)
 
 
 class GenesSchema(ma.SQLAlchemyAutoSchema):
