@@ -1,11 +1,11 @@
 import pytest
 from fibrodb import create_app
 from fibrodb.model import db
-from fibrodb.db import clean_init_db
+from fibrodb.db import clean_init_db, load_db
 
 
 @pytest.fixture
-def app():
+def client():
     test_db = 'sqlite:///../tests/fibrodb.test.db'
     app = create_app(test_config={
         'TESTING': True,
@@ -13,18 +13,10 @@ def app():
         "SQLALCHEMY_TRACK_MODIFICATIONS": True
     })
 
-    with app.app_context():
-        db.init_app(app)
-        clean_init_db(db)
+    with app.test_client() as client:
+        with app.app_context():
+            db.init_app(app)
+            clean_init_db(db)
+            load_db(db)
 
-    yield app
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture
-def runner(app):
-    return app.test_cli_runner()
+        yield client
