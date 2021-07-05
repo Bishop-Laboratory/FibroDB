@@ -15,14 +15,13 @@ git clone https://github.com/Bishop-Laboratory/Fibroblast-lncRNASeq-explorer.git
 
 ```shell
 cd Fibroblast-lncRNASeq-explorer/
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
+bash install.sh
 ```
 
 3. Run the app
 
 ```shell
+source env/bin/activate
 pip install -e .
 export FLASK_APP=fibrodb
 export FLASK_ENV=development
@@ -55,14 +54,8 @@ please see [this guide](https://flask.palletsprojects.com/en/2.0.x/tutorial/test
 8. Submit a pull request to merge your changes into the main branch when you are ready! Make sure to request a review and
 make sure that your unit tests are passing. New comits should trigger the GitHub testing workflow to run, so check the "Actions" panel to see if it is passing.
 
-Finally, the source data can be found here:
+Finally, the source data can be found here: https://uthscsa.box.com/s/lgcymxl0jef9wnmvqpvd9v3ih8820ti6
 
-https://www.dropbox.com/t/h1n4gOsV8tD4cnQ3
-
-https://www.dropbox.com/t/rH6iCwal5YvUjHg1
-
-https://www.dropbox.com/t/ShfrDJbtiBR64k1q
-
-https://www.dropbox.com/t/49xanARJVYJADm45
+Here is the direct link on AWS: https://fibrodb-data.s3-us-west-2.amazonaws.com/Fibroblast-Fibrosis.zip
 
 And the manuscript is here: https://uthscsa.box.com/s/b1hg9urz7dollxkpisgcyfih0l9djm1v
