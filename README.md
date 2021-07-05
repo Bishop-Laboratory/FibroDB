@@ -1,4 +1,6 @@
 # Fibroblast-lncRNASeq-explorer
+![Build Status](https://github.com/Bishop-Laboratory/Fibroblast-lncRNASeq-explorer/workflows/build/badge.svg)
+
 Flask app for exploring the fibroblast lncRNA-Seq dataset from Therkelsen et al. 2021
 
 ## Development guide
