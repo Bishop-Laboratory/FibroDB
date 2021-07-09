@@ -55,5 +55,4 @@ def degs_api():
 def gene_exp_api():
     """API resource - Query Gene Exp by any column"""
     gene_exp = GeneExp.query.filter_by(**request.args.to_dict()).all()
-    print(gene_exp)
     return jsonify(geneexp_schema.dump(gene_exp))
