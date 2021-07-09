@@ -3,7 +3,8 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link
+    Link,
+    useParams
   } from "react-router-dom";
   import {Menu} from './components/pageview.jsx';
   import Plot from 'react-plotly.js';
@@ -16,13 +17,22 @@ import {
           <nav>
             <Menu>
               <div>
-                <Link to="/">Home2</Link>
+                <Link to="/">Home</Link>
               </div>
               <div>
-                <Link to="/search-genes">Search-Genes</Link>
+                <Link to="/results">Results Overview</Link>
+              </div>
+              <div>
+                <Link to="/genes">Genes Overview</Link>
               </div>
               <div>
                 <Link to="/about">About</Link>
+              </div>
+              <div>
+                <Link to="/downloads">Downloads</Link>
+              </div>
+              <div>
+                <Link to="/help">Help</Link>
               </div>
             </Menu>
           </nav>
@@ -31,11 +41,20 @@ import {
             <Route exact path="/">
               <Home />
             </Route>
-            <Route path="/search-genes">
-              <Search />
+            <Route path="/results">
+              <Results />
+            </Route>
+            <Route path="/genes/:geneid">
+              <Genes />
             </Route>
             <Route path="/about">
               <About />
+            </Route>
+            <Route path="/downloads">
+              <TBA />
+            </Route>
+            <Route path="/help">
+              <TBA />
             </Route>
           </Switch>
         </div>
@@ -44,16 +63,31 @@ import {
   }
   
   function Home() {
-    return <div><h2>Home</h2><SearchForm/></div>;
+    return <div><h2>Welcome!</h2><SearchForm/></div>;
   }
   
   function About() {
     return <h2>About</h2>;
   }
   
-  function Search() {
+  function Results() {
     return <div>
-        <h2>Search</h2>
+        <h2>Results</h2>
       <Volcano/>
     </div>;
+  }
+
+  function Genes() {
+    let { geneid } = useParams();
+    return <div>
+        <h2>Genes</h2>
+        <h3>{geneid}</h3>
+      <Volcano/>
+    </div>;
+  }
+
+  function TBA() {
+    return <div>
+      <h2> To Be Added. </h2>
+    </div>
   }

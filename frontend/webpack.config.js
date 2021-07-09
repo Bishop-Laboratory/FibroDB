@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
   mode: 'development',
   entry: './frontend/js/main.jsx',
+  watch: true,
   output: {
     path: path.join(__dirname, '/frontend/static/js/'),
     filename: 'bundle.js',
