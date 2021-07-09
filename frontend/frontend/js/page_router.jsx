@@ -9,7 +9,11 @@ import {
   import {Menu} from './components/pageview.jsx';
   import Plot from 'react-plotly.js';
   import Volcano from './volcanoplot.jsx';
+  import GenePlot from './GenePlot.jsx';
   import SearchForm from './SearchForm.jsx';
+
+
+
   export default function App() {
     return (
       <Router>
@@ -81,8 +85,7 @@ import {
     let { geneid } = useParams();
     return <div>
         <h2>Genes</h2>
-        <h3>{geneid}</h3>
-      <Volcano/>
+      <GenePlot genename={geneid}/>
     </div>;
   }
 
