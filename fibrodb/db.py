@@ -134,20 +134,20 @@ def load_test_data(db):
     db.session.add(deg)
     db.session.commit()
     deg = DEGs(
-        deg_id=1, study_id='SRP120020194',
+        deg_id=4, study_id='SRP120020194',
         gene_id="ENSG00000141510", fc=-1.203,
         pval=.02, padj=.13, sig=False
     )
     db.session.add(deg)
     db.session.commit()
     deg = DEGs(
-        deg_id=2, study_id='SRP120020194', gene_id="ENSG00000012048",
+        deg_id=5, study_id='SRP120020194', gene_id="ENSG00000012048",
         fc=2.34, pval=.0045, padj=.023, sig=True
     )
     db.session.add(deg)
     db.session.commit()
     deg = DEGs(
-        deg_id=3, study_id='SRP120020194', gene_id="ENSG00000245532",
+        deg_id=6, study_id='SRP120020194', gene_id="ENSG00000245532",
         fc=4.85, pval=.00065, padj=.005, sig=True
     )
     db.session.add(deg)
@@ -257,7 +257,7 @@ def load_test_data(db):
     db.session.commit()
     # Test data add GeneExp
     gene_exp = GeneExp(
-        expression_id=1,
+        expression_id=10,
         gene_id='ENSG00000141510',
         sample_id="SRX10300312",
         raw_counts=138,
@@ -268,7 +268,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=2,
+        expression_id=11,
         gene_id='ENSG00000012048',
         sample_id="SRX10300312",
         raw_counts=25,
@@ -279,7 +279,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=3,
+        expression_id=12,
         gene_id='ENSG00000245532',
         sample_id="SRX10300312",
         raw_counts=640,
@@ -290,7 +290,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=4,
+        expression_id=13,
         gene_id='ENSG00000141510',
         sample_id="SRX10300311",
         raw_counts=165,
@@ -301,7 +301,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=5,
+        expression_id=14,
         gene_id='ENSG00000012048',
         sample_id="SRX10300311",
         raw_counts=63,
@@ -312,7 +312,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=6,
+        expression_id=15,
         gene_id='ENSG00000245532',
         sample_id="SRX10300311",
         raw_counts=231,
@@ -325,7 +325,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=7,
+        expression_id=16,
         gene_id='ENSG00000141510',
         sample_id="SRX10300310",
         raw_counts=263,
@@ -336,7 +336,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=8,
+        expression_id=17,
         gene_id='ENSG00000012048',
         sample_id="SRX10300310",
         raw_counts=224,
@@ -347,7 +347,7 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
     gene_exp = GeneExp(
-        expression_id=9,
+        expression_id=18,
         gene_id='ENSG00000245532',
         sample_id="SRX10300310",
         raw_counts=546,
