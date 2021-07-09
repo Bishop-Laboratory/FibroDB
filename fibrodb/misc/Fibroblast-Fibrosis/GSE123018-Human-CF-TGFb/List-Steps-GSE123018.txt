@@ -1,0 +1,170 @@
+# Download SRA files to ~./sra_files/ and extract FASTQ files
+# "fasterq-dump" version 2.10.5
+# Ran on 03/11/2021
+
+prefetch --option-file SRR_Acc_List-RNA-seq.txt
+
+fasterq-dump --split-files ./SRR8249114/SRR8249114.sra
+fasterq-dump --split-files ./SRR8249115/SRR8249115.sra
+fasterq-dump --split-files ./SRR8249116/SRR8249116.sra
+fasterq-dump --split-files ./SRR8249117/SRR8249117.sra
+fasterq-dump --split-files ./SRR8249118/SRR8249118.sra
+fasterq-dump --split-files ./SRR8249119/SRR8249119.sra
+fasterq-dump --split-files ./SRR8249120/SRR8249120.sra
+fasterq-dump --split-files ./SRR8249121/SRR8249121.sra
+fasterq-dump --split-files ./SRR8249122/SRR8249122.sra
+fasterq-dump --split-files ./SRR8249123/SRR8249123.sra
+fasterq-dump --split-files ./SRR8249124/SRR8249124.sra
+fasterq-dump --split-files ./SRR8249125/SRR8249125.sra
+fasterq-dump --split-files ./SRR8249126/SRR8249126.sra
+fasterq-dump --split-files ./SRR8249127/SRR8249127.sra
+fasterq-dump --split-files ./SRR8249128/SRR8249128.sra
+fasterq-dump --split-files ./SRR8249129/SRR8249129.sra
+fasterq-dump --split-files ./SRR8249130/SRR8249130.sra
+fasterq-dump --split-files ./SRR8249131/SRR8249131.sra
+fasterq-dump --split-files ./SRR8249132/SRR8249132.sra
+fasterq-dump --split-files ./SRR8249133/SRR8249133.sra
+
+
+# Download the genome assembly and GTF file for human
+# Use GRCh38.103
+
+wget http://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+wget http://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz
+
+# Expand the GZ files.
+gunzip *.gz
+
+
+# Make index file for STAR aligner.
+STAR --runMode genomeGenerate --runThreadN 8 --genomeDir ./ --genomeFastaFiles Homo_sapiens.GRCh38.dna.primary_assembly.fa --sjdbGTFfile Homo_sapiens.GRCh38.103.gtf
+
+
+# Run FASTP to perform read filtrations. 
+# version: fastp 0.21.0
+# Ran on 03/11/2021
+fastp -i SRR8249114.sra_1.fastq -I SRR8249114.sra_2.fastq -o SRR8249114_1.trimmed.fastq -O SRR8249114_2.trimmed.fastq -h SRR8249114-fastp.html -j SRR8249114_fastp.json
+fastp -i SRR8249115.sra_1.fastq -I SRR8249115.sra_2.fastq -o SRR8249115_1.trimmed.fastq -O SRR8249115_2.trimmed.fastq -h SRR8249115-fastp.html -j SRR8249115_fastp.json
+fastp -i SRR8249116.sra_1.fastq -I SRR8249116.sra_2.fastq -o SRR8249116_1.trimmed.fastq -O SRR8249116_2.trimmed.fastq -h SRR8249116-fastp.html -j SRR8249116_fastp.json
+fastp -i SRR8249117.sra_1.fastq -I SRR8249117.sra_2.fastq -o SRR8249117_1.trimmed.fastq -O SRR8249117_2.trimmed.fastq -h SRR8249117-fastp.html -j SRR8249117_fastp.json
+fastp -i SRR8249118.sra_1.fastq -I SRR8249118.sra_2.fastq -o SRR8249118_1.trimmed.fastq -O SRR8249118_2.trimmed.fastq -h SRR8249118-fastp.html -j SRR8249118_fastp.json
+fastp -i SRR8249119.sra_1.fastq -I SRR8249119.sra_2.fastq -o SRR8249119_1.trimmed.fastq -O SRR8249119_2.trimmed.fastq -h SRR8249119-fastp.html -j SRR8249119_fastp.json
+fastp -i SRR8249120.sra_1.fastq -I SRR8249120.sra_2.fastq -o SRR8249120_1.trimmed.fastq -O SRR8249120_2.trimmed.fastq -h SRR8249120-fastp.html -j SRR8249120_fastp.json
+fastp -i SRR8249121.sra_1.fastq -I SRR8249121.sra_2.fastq -o SRR8249121_1.trimmed.fastq -O SRR8249121_2.trimmed.fastq -h SRR8249121-fastp.html -j SRR8249121_fastp.json
+fastp -i SRR8249122.sra_1.fastq -I SRR8249122.sra_2.fastq -o SRR8249122_1.trimmed.fastq -O SRR8249122_2.trimmed.fastq -h SRR8249122-fastp.html -j SRR8249122_fastp.json
+fastp -i SRR8249123.sra_1.fastq -I SRR8249123.sra_2.fastq -o SRR8249123_1.trimmed.fastq -O SRR8249123_2.trimmed.fastq -h SRR8249123-fastp.html -j SRR8249123_fastp.json
+fastp -i SRR8249124.sra_1.fastq -I SRR8249124.sra_2.fastq -o SRR8249124_1.trimmed.fastq -O SRR8249124_2.trimmed.fastq -h SRR8249124-fastp.html -j SRR8249124_fastp.json
+fastp -i SRR8249125.sra_1.fastq -I SRR8249125.sra_2.fastq -o SRR8249125_1.trimmed.fastq -O SRR8249125_2.trimmed.fastq -h SRR8249125-fastp.html -j SRR8249125_fastp.json
+fastp -i SRR8249126.sra_1.fastq -I SRR8249126.sra_2.fastq -o SRR8249126_1.trimmed.fastq -O SRR8249126_2.trimmed.fastq -h SRR8249126-fastp.html -j SRR8249126_fastp.json
+fastp -i SRR8249127.sra_1.fastq -I SRR8249127.sra_2.fastq -o SRR8249127_1.trimmed.fastq -O SRR8249127_2.trimmed.fastq -h SRR8249127-fastp.html -j SRR8249127_fastp.json
+fastp -i SRR8249128.sra_1.fastq -I SRR8249128.sra_2.fastq -o SRR8249128_1.trimmed.fastq -O SRR8249128_2.trimmed.fastq -h SRR8249128-fastp.html -j SRR8249128_fastp.json
+fastp -i SRR8249129.sra_1.fastq -I SRR8249129.sra_2.fastq -o SRR8249129_1.trimmed.fastq -O SRR8249129_2.trimmed.fastq -h SRR8249129-fastp.html -j SRR8249129_fastp.json
+fastp -i SRR8249130.sra_1.fastq -I SRR8249130.sra_2.fastq -o SRR8249130_1.trimmed.fastq -O SRR8249130_2.trimmed.fastq -h SRR8249130-fastp.html -j SRR8249130_fastp.json
+fastp -i SRR8249131.sra_1.fastq -I SRR8249131.sra_2.fastq -o SRR8249131_1.trimmed.fastq -O SRR8249131_2.trimmed.fastq -h SRR8249131-fastp.html -j SRR8249131_fastp.json
+fastp -i SRR8249132.sra_1.fastq -I SRR8249132.sra_2.fastq -o SRR8249132_1.trimmed.fastq -O SRR8249132_2.trimmed.fastq -h SRR8249132-fastp.html -j SRR8249132_fastp.json
+fastp -i SRR8249133.sra_1.fastq -I SRR8249133.sra_2.fastq -o SRR8249133_1.trimmed.fastq -O SRR8249133_2.trimmed.fastq -h SRR8249133-fastp.html -j SRR8249133_fastp.json
+
+
+# Align the sequence reads to the genome using STAR
+# version STAR             020201
+# Ran on 03/12/2021
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249114_1.trimmed.fastq ./sra_files/SRR8249114_2.trimmed.fastq --outFileNamePrefix SRR8249114_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249115_1.trimmed.fastq ./sra_files/SRR8249115_2.trimmed.fastq --outFileNamePrefix SRR8249115_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249116_1.trimmed.fastq ./sra_files/SRR8249116_2.trimmed.fastq --outFileNamePrefix SRR8249116_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249117_1.trimmed.fastq ./sra_files/SRR8249117_2.trimmed.fastq --outFileNamePrefix SRR8249117_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249118_1.trimmed.fastq ./sra_files/SRR8249118_2.trimmed.fastq --outFileNamePrefix SRR8249118_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249119_1.trimmed.fastq ./sra_files/SRR8249119_2.trimmed.fastq --outFileNamePrefix SRR8249119_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249120_1.trimmed.fastq ./sra_files/SRR8249120_2.trimmed.fastq --outFileNamePrefix SRR8249120_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249121_1.trimmed.fastq ./sra_files/SRR8249121_2.trimmed.fastq --outFileNamePrefix SRR8249121_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249122_1.trimmed.fastq ./sra_files/SRR8249122_2.trimmed.fastq --outFileNamePrefix SRR8249122_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249123_1.trimmed.fastq ./sra_files/SRR8249123_2.trimmed.fastq --outFileNamePrefix SRR8249123_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249124_1.trimmed.fastq ./sra_files/SRR8249124_2.trimmed.fastq --outFileNamePrefix SRR8249124_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249125_1.trimmed.fastq ./sra_files/SRR8249125_2.trimmed.fastq --outFileNamePrefix SRR8249125_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249126_1.trimmed.fastq ./sra_files/SRR8249126_2.trimmed.fastq --outFileNamePrefix SRR8249126_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249127_1.trimmed.fastq ./sra_files/SRR8249127_2.trimmed.fastq --outFileNamePrefix SRR8249127_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249128_1.trimmed.fastq ./sra_files/SRR8249128_2.trimmed.fastq --outFileNamePrefix SRR8249128_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249129_1.trimmed.fastq ./sra_files/SRR8249129_2.trimmed.fastq --outFileNamePrefix SRR8249129_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249130_1.trimmed.fastq ./sra_files/SRR8249130_2.trimmed.fastq --outFileNamePrefix SRR8249130_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249131_1.trimmed.fastq ./sra_files/SRR8249131_2.trimmed.fastq --outFileNamePrefix SRR8249131_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249132_1.trimmed.fastq ./sra_files/SRR8249132_2.trimmed.fastq --outFileNamePrefix SRR8249132_
+STAR --runMode alignReads --runThreadN 8 --genomeDir ../../../references/Human/GRCh38.103/ --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outReadsUnmapped Fastx --sjdbGTFfile ../../../references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf --readFilesIn ./sra_files/SRR8249133_1.trimmed.fastq ./sra_files/SRR8249133_2.trimmed.fastq --outFileNamePrefix SRR8249133_
+
+
+# Generate a gene matrix
+
+#########
+# Stranded
+#########
+
+######
+# 24h vs. Baseline
+######
+
+paste SRR8249118_ReadsPerGene.out.tab SRR8249123_ReadsPerGene.out.tab SRR8249128_ReadsPerGene.out.tab SRR8249133_ReadsPerGene.out.tab SRR8249114_ReadsPerGene.out.tab SRR8249119_ReadsPerGene.out.tab SRR8249124_ReadsPerGene.out.tab SRR8249129_ReadsPerGene.out.tab | cut -f1,4,8,12,16,20,24,28,32 | tail -n +5 > tmpfile
+
+cat tmpfile | sed "s/^gene://" >gene_count_stranded_bsl_24h.txt
+
+
+# Run edgeR on R to derive differentially expressed genes
+library(edgeR)
+library(GenomicFeatures)
+
+x <- read.delim("gene_count_stranded_bsl_24h.txt", header=F, row.names=1)
+colnames(x)<-c("Baseline_1","Baseline_2","Baseline_3","Baseline_4","24h_1","24h_2","24h_3","24h_4")
+group <- factor(c(1,1,1,1,2,2,2,2))
+y <- DGEList(counts=x,group=group)
+y <- calcNormFactors(y)
+
+# Calculate CPM (counts per million) values
+d <-cpm(y)
+
+# Write out the CPM values for each gene into a table
+write.table(d, "GSE123018-GRCh38.103-Stranded-bsl_vs_24h-CPM.txt", sep="\t")
+
+# Calculating RPKM
+# https://research.stowers.org/cws/CompGenomics/Projects/edgeR.html
+
+# give the gene lengths
+gtf_file <- "/references/Human/GRCh38.103/Homo_sapiens.GRCh38.103.gtf"
+txdb <- makeTxDbFromGFF(file=gtf_file)
+tx_by_gene <- transcriptsBy(txdb, 'gene')
+geneLengths <- sum(width(reduce(tx_by_gene)))
+
+# using our DGE list object from above
+iv <- match(rownames(y), names(geneLengths))
+
+fpkm <- rpkm(y, geneLengths[iv])
+
+# Write out the RPKM values for each gene into a table
+write.table(fpkm, "GSE123018-GRCh38.103-Stranded-bsl_vs_24h-RPKM.txt", sep="\t")
+
+
+# Calculate TPM from RPKM
+# http://luisvalesilva.com/datasimple/rna-seq_units.html
+tpm_from_rpkm <- function(x){
+	rpkm.sum <-colSums(x)
+	return(t(t(x) / (1e-06 * rpkm.sum)))
+}
+
+tpm <- tpm_from_rpkm(fpkm)
+
+# Write out the TPM values for each gene into a table
+write.table(tpm, "GSE123018-GRCh38.103-Stranded-bsl_vs_24h-TPM.txt", sep="\t")
+
+
+# Calculate differentially expressed genes
+design<-model.matrix(~0+group)
+y <- estimateGLMCommonDisp(y,design)
+y <- estimateGLMTrendedDisp(y,design)
+y <- estimateGLMTagwiseDisp(y,design)
+fit<-glmFit(y,design)
+lrt.2vs1 <- glmLRT(fit, contrast=c(-1,1))
+
+# To get out FDR
+out <- topTags(lrt.2vs1, n = "Inf")$table
+
+# Write out the results
+write.table(out, "GSE123018-GRCh38.103-Stranded-bsl_vs_24h-Ratio.txt", sep="\t")
+
+q()
+
