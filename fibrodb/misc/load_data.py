@@ -111,92 +111,92 @@ def extract_sample_info(df, study_name, sample_names, parameter):
     data['sample_info'] = {}
     data['gene_expr'] = {}
     for row in df.index:
-        if row < 5:
-            current_cond = None
-            cols = df.loc[row,:].to_frame().T.columns
-            # print(f"Columns: {list(cols)}")
+        # if row < 5:
+        current_cond = None
+        cols = df.loc[row,:].to_frame().T.columns
+        # print(f"Columns: {list(cols)}")
 
-            #get sample-unspecific parameters for study-gene combination
-            ensembl_id = df.loc[row, 'Ensembl Gene ID']
-            gene_symbol = df.loc[row, 'Gene Symbol']
-            print(f"Current gene symbol: {gene_symbol}", end="\r")
-            biotype = df.loc[row, 'Biotype']
-            logFC = df.loc[row, 'logFC'] if 'logFC' in cols else np.nan
-            logCPM = df.loc[row, 'logCPM'] if 'logCPM' in cols else np.nan
-            lr = df.loc[row, 'LR'] if 'LR' in cols else np.nan
-            pval = df.loc[row, 'PValue'] if 'PValue' in cols else np.nan
-            fdr = df.loc[row, 'FDR'] if 'FDR' in cols else np.nan   
-            counter = 0
+        #get sample-unspecific parameters for study-gene combination
+        ensembl_id = df.loc[row, 'Ensembl Gene ID']
+        gene_symbol = df.loc[row, 'Gene Symbol']
+        print(f"Current gene symbol: {gene_symbol}", end="\r")
+        biotype = df.loc[row, 'Biotype']
+        logFC = df.loc[row, 'logFC'] if 'logFC' in cols else np.nan
+        logCPM = df.loc[row, 'logCPM'] if 'logCPM' in cols else np.nan
+        lr = df.loc[row, 'LR'] if 'LR' in cols else np.nan
+        pval = df.loc[row, 'PValue'] if 'PValue' in cols else np.nan
+        fdr = df.loc[row, 'FDR'] if 'FDR' in cols else np.nan   
+        counter = 0
 
-            for column in cols:   
-                # conditions for columns to exclude - excluded columns are non-condition columns
-                no_ensembl = ('Ensembl' not in column)
-                no_gsymbl = (column != 'Gene Symbol')
-                no_biotype = (column != 'Biotype')
-                no_FC = (column != 'logFC')
-                no_cpm = (column != 'logCPM')
-                no_LR = (column != 'LR')
-                no_pval = (column != 'PValue')
-                no_FDR = (column != 'FDR')
+        for column in cols:   
+            # conditions for columns to exclude - excluded columns are non-condition columns
+            no_ensembl = ('Ensembl' not in column)
+            no_gsymbl = (column != 'Gene Symbol')
+            no_biotype = (column != 'Biotype')
+            no_FC = (column != 'logFC')
+            no_cpm = (column != 'logCPM')
+            no_LR = (column != 'LR')
+            no_pval = (column != 'PValue')
+            no_FDR = (column != 'FDR')
 
-                data['gene_info'][gene_symbol] = {}
+            data['gene_info'][gene_symbol] = {}
 
-                if no_biotype and no_cpm and no_ensembl and no_FC and no_FDR and no_gsymbl and no_LR and no_pval:
-                    sample_name = sample_names[counter]
-                    if sample_name not in data['sample_info']:  #make sure older entries (of different paramaters (cpm, rpkm etc.) from different files are not overwritten or deleted)
-                        data['sample_info'][sample_name] = {}
-                    if sample_name not in data['gene_expr']:
-                        data['gene_expr'][sample_name] = {}
-                    if gene_symbol not in data['gene_expr'][sample_name]:
-                        data['gene_expr'][sample_name][gene_symbol] = {}
+            if no_biotype and no_cpm and no_ensembl and no_FC and no_FDR and no_gsymbl and no_LR and no_pval:
+                sample_name = sample_names[counter]
+                if sample_name not in data['sample_info']:  #make sure older entries (of different paramaters (cpm, rpkm etc.) from different files are not overwritten or deleted)
+                    data['sample_info'][sample_name] = {}
+                if sample_name not in data['gene_expr']:
+                    data['gene_expr'][sample_name] = {}
+                if gene_symbol not in data['gene_expr'][sample_name]:
+                    data['gene_expr'][sample_name][gene_symbol] = {}
 
-                    #print(sample_name, ':', column)  ##uncomment for troubleshooting
-                    counter +=1
-                    try:
-                        if '.' in column:
-                            condition, replicate = column.split(".")
-                            current_cond = current_cond if (current_cond == condition ) else None
-                            replicate = int(replicate)+1 if current_cond else int(replicate)
-                        elif '_' in column:
-                            condition, replicate = column.split("_")
-                            current_cond = current_cond if (current_cond == condition ) else None
-                            replicate = int(replicate)+1 if current_cond else int(replicate)
-                        else:
-                            condition = column
-                            replicate = 1
-                            current_cond = condition
-                            replicate = int(replicate)
-                        #     # print(column, "!!!!")
-                        #     # print(f"Columns: {cols}")
-                    except ValueError:
-                        condition = column 
-                        replicate = 1
-                        current_cond = condition
-                        print(f"EXCEPT 1 in columns {column}", end="\r")
-                    except UnboundLocalError:
+                #print(sample_name, ':', column)  ##uncomment for troubleshooting
+                counter +=1
+                try:
+                    if '.' in column:
+                        condition, replicate = column.split(".")
+                        current_cond = current_cond if (current_cond == condition ) else None
+                        replicate = int(replicate)+1 if current_cond else int(replicate)
+                    elif '_' in column:
+                        condition, replicate = column.split("_")
+                        current_cond = current_cond if (current_cond == condition ) else None
+                        replicate = int(replicate)+1 if current_cond else int(replicate)
+                    else:
                         condition = column
                         replicate = 1
-                        print("EXCEPT 2", end="\r")
-                    col_val = df.loc[row, column]
-                    if isinstance(col_val, float) or  isinstance(col_val, int):
-                        # print(f"Value for sample {sample_name} - condition {column}: {col_val};\t\t\treplicate:{replicate}")
+                        current_cond = condition
+                        replicate = int(replicate)
+                    #     # print(column, "!!!!")
+                    #     # print(f"Columns: {cols}")
+                except ValueError:
+                    condition = column 
+                    replicate = 1
+                    current_cond = condition
+                    print(f"EXCEPT 1 in columns {column}", end="\r")
+                except UnboundLocalError:
+                    condition = column
+                    replicate = 1
+                    print("EXCEPT 2", end="\r")
+                col_val = df.loc[row, column]
+                if isinstance(col_val, float) or  isinstance(col_val, int):
+                    # print(f"Value for sample {sample_name} - condition {column}: {col_val};\t\t\treplicate:{replicate}")
 
-                        if 'condition' not in data['sample_info'][sample_name]:
-                            data['sample_info'][sample_name]['condition'] = condition
-                        if 'replicate' not in data['sample_info'][sample_name]:
-                            data['sample_info'][sample_name]['replicate'] = replicate
-                        data['gene_expr'][sample_name][gene_symbol][parameter] = col_val
-                        
-            # print('\n')
-        
-            data['gene_info'][gene_symbol]['ensembl_ID'] = ensembl_id
-            # data['gene_symbol'] = gene_symbol
-            data['gene_info'][gene_symbol]['biotype'] = biotype
-            data['gene_info'][gene_symbol]['logFC'] = logFC
-            data['gene_info'][gene_symbol]['logCPM'] = logCPM
-            data['gene_info'][gene_symbol]['LR'] = lr
-            data['gene_info'][gene_symbol]['pval'] = pval
-            data['gene_info'][gene_symbol]['FDR'] = fdr
+                    if 'condition' not in data['sample_info'][sample_name]:
+                        data['sample_info'][sample_name]['condition'] = condition
+                    if 'replicate' not in data['sample_info'][sample_name]:
+                        data['sample_info'][sample_name]['replicate'] = replicate
+                    data['gene_expr'][sample_name][gene_symbol][parameter] = col_val
+                    
+        # print('\n')
+    
+        data['gene_info'][gene_symbol]['ensembl_ID'] = ensembl_id
+        # data['gene_symbol'] = gene_symbol
+        data['gene_info'][gene_symbol]['biotype'] = biotype
+        data['gene_info'][gene_symbol]['logFC'] = logFC
+        data['gene_info'][gene_symbol]['logCPM'] = logCPM
+        data['gene_info'][gene_symbol]['LR'] = lr
+        data['gene_info'][gene_symbol]['pval'] = pval
+        data['gene_info'][gene_symbol]['FDR'] = fdr
 
     print('', end="\r")
     return data
@@ -421,12 +421,13 @@ def load_to_db(db, path):
 # run script directly for testinf purposes
 if __name__ == "__main__":
 
-    # Uncomment for re-creating csv files (e.g. from new data)
-    data_structure = get_dir_structure(f'raw_data')
-    study_info = extract_study_names(data_structure)
-    samples, gene_exp, degs =  info_to_db_format(study_info)
-    save_to_csv(samples=samples, gene_exp=gene_exp, degs=degs)
-    print('\n')
+    # # Uncomment for re-creating csv files (e.g. from new data)
+    # data_structure = get_dir_structure(f'raw_data')
+    # study_info = extract_study_names(data_structure)
+    # samples, gene_exp, degs =  info_to_db_format(study_info)
+    # save_to_csv(samples=samples, gene_exp=gene_exp, degs=degs)
+    # print('\n')
+
 
     # app = Flask(__name__, instance_relative_config=True)
     # db.init_app(app)
@@ -434,6 +435,8 @@ if __name__ == "__main__":
     #     db.drop_all()
     #     db.create_all()
     #     tot_start = time.perf_counter()
-    #     load_to_db(db=db, path=f"misc{os.sep}clean_data")
+    #     load_to_db(db=db, path=f"clean_data")
     #     tot_end = time.perf_counter()
     # print(f"Total loading time: {tot_end-tot_start}")
+
+    print("No Errors Detected.")
