@@ -13,7 +13,7 @@ def clean_init_db(db):
     db.create_all()
 
 
-def load_db(db):
+def load_db(db, data_url=None):
     """
     Load all data into the db
 
@@ -23,10 +23,10 @@ def load_db(db):
     """
 
     if data_url:
-    try:
-        download_data(data_url)
-    except:
-        print('[-] ERROR! Please check the URL provided!')
+        try:
+            download_data(data_url)
+        except:
+            print('[-] ERROR! Please check the URL provided!')
 
 
     #load data
