@@ -28,7 +28,11 @@ def load_db(db):
     except:
         print('[-] ERROR! Please check the URL provided!')
 
-    load_real_data(db) 
+
+    #load data
+    load_data(db) 
+
+
     # Load gene datasets
     load_gene_data(db)
 
@@ -372,5 +376,5 @@ def load_test_data(db):
     db.session.commit()
 
 
-def load_real_data(db, data_dir=f"misc{os.sep}clean_data"):
+def load_data(db, data_dir=f"fibrodb{os.sep}misc{os.sep}clean_data"):
     load_to_db(db, data_dir)
