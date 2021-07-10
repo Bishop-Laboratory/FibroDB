@@ -8,6 +8,9 @@ Information will be stored in .csv files as intermediary between data extraction
 
 Information (per entry) from csv files will be saved into lists corresponding to db tables as class objects and added and 
 committed to corresponding db table.
+
+NOTE: may refactor code later, in order to add+commit info directly without saving to .csv
+      --> function to modify to this end - info_to_db_format()
 """
 
 # imports
@@ -19,6 +22,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 import time
 
+from fibrodb.model import Samples, GeneExp, DEGs
 
 from flask import Flask
 
