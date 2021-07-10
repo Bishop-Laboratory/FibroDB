@@ -16,7 +16,6 @@ import os
 import re
 import numpy as np
 import json
-from model import db, Genes, GeneAliases, GeneExp, DEGs, Samples
 from flask_sqlalchemy import SQLAlchemy
 import time
 
