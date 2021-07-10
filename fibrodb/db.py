@@ -37,6 +37,25 @@ def load_db(db, data_url=None):
     load_gene_data(db)
 
 
+
+def download_data(url):
+    """
+    Downloads zip file from given url, unzips it and saves unzipped content to 'raw_data' dfolder within the 'misc' directory
+    """
+    from io import BytesIO
+    from urllib.request import urlopen
+    from zipfile import ZipFile
+    import os
+    zipurl = url
+    print(os.getcwd())
+    print("[+] Opening ZIP file")
+    with urlopen(zipurl) as zipresp:
+        print("[+] Reading ZIP file")
+        with ZipFile(BytesIO(zipresp.read())) as zfile:
+            print("[+] ZIP file extracted to 'data' directory")
+            zfile.extractall(f'misc{os.sep}raw_data')
+
+
 def load_gene_data(db):
     """Load the gene info tables into the database"""
     # Find the gene datasets
