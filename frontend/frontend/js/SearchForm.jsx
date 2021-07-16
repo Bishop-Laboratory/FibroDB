@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import  { Redirect } from 'react-router-dom';
-
+import { SERVER_BASE } from './constants';
 import { useHistory } from "react-router-dom";
 
 export default function SearchForm() {
@@ -44,7 +44,7 @@ export default function SearchForm() {
       onInputChange={(event, newInputValue) => {
         event.preventDefault();
         setInputValue(newInputValue);
-        fetch("http://localhost:5000/api-v1/gene-aliases?alias_symbol="+newInputValue)
+        fetch(SERVER_BASE + "gene-aliases?alias_symbol="+newInputValue)
               .then(res => res.json())
               .then(
                 (result) => {

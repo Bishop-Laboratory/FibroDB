@@ -21,6 +21,7 @@ import numpy as np
 import json
 from flask_sqlalchemy import SQLAlchemy
 import time
+from tqdm import tqdm
 
 from fibrodb.model import Samples, GeneExp, DEGs
 
@@ -329,8 +330,8 @@ def read_csv_data(path):
         if "samples" in file.lower():
             print(f"[+] Iterating over {len(df)} entries to load into 'Samples' table...")
             df.rename(columns={'Unnamed: 0': 'sample_id'}, inplace=True)
-            for i, row in df.iloc[:].iterrows():
-                print(f"\tCurrent entry with sample ID: {row.sample_id}", end="\r")
+            for i, row in tqdm(df.iloc[:].iterrows()):
+                #print(f"\tCurrent entry with sample ID: {row.sample_id}", end="\r")
                 s1 = Samples(
                         sample_id = row.sample_id,
                         study_id = row.study_id,
@@ -343,8 +344,8 @@ def read_csv_data(path):
         elif "gene_exp" in file.lower():
             print(f"[+] Iterating over {len(df)} entries to load into 'GeneExp' table...")
             df.rename(columns={'Unnamed: 0': 'sample_id', 'Unnamed: 1': 'gene_id'}, inplace=True)
-            for i, row in df.iloc[:].iterrows():
-                print(f"\tCurrent entry with sample ID: {row.sample_id} and gene ID: {row.gene_id}", end="\r")
+            for i, row in tqdm(df.iloc[:].iterrows()):
+                #print(f"\tCurrent entry with sample ID: {row.sample_id} and gene ID: {row.gene_id}", end="\r")
                 g1 = GeneExp(
                     gene_id = row.gene_id,
                     sample_id = row.sample_id,
@@ -359,8 +360,8 @@ def read_csv_data(path):
         elif "deg" in file.lower():
             print(f"[+] Iterating over {len(df)} entries to load into 'DEGs' table...")
             df.rename(columns={'Unnamed: 0': 'study_id', 'Unnamed: 1': 'gene_id'}, inplace=True)
-            for i, row in df.iloc[:].iterrows():
-                print(f"\tCurrent entry with study ID: {row.study_id} and gene ID: {row.gene_id}", end="\r")
+            for i, row in tqdm(df.iloc[:].iterrows()):
+                #print(f"\tCurrent entry with study ID: {row.study_id} and gene ID: {row.gene_id}", end="\r")
                 d1 = DEGs(
                     gene_id = row.gene_id,
                     study_id = row.study_id,
@@ -405,7 +406,7 @@ def load_to_db(db, path):
     t1 = time.perf_counter()
     iterator = list(range(len(gene_exp_items)))
     l_start = 0
-    for i in iterator[::1000000]:  #add and commit gene exp data in chunks to avoid system crashing
+    for i in tqdm(iterator[::10000]):  #add and commit gene exp data in chunks to avoid system crashing
         db.session.add_all(gene_exp_items[l_start:i])
         db.session.commit()
         l_start = i

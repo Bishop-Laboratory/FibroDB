@@ -5,7 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
-
+import { SERVER_BASE } from './constants';
 const useStyles = makeStyles((theme) => ({
     formControl: {
       margin: theme.spacing(1),
@@ -41,7 +41,7 @@ export default function GenePlot(genename) {
   genename = genename["genename"];
 
   useEffect(() => {
-    fetch("http://localhost:5000/api-v1/expression?gene_id="+genename)
+    fetch(SERVER_BASE + "expression?gene_id="+genename)
       .then(res => res.json())
       .then(
         (result) => {
