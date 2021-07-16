@@ -42,6 +42,7 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
     """
     Iterates over csv files in directory and loads csv data to db tables.
     """
+    print("LOADIN DATA!!!")
 
     for file in os.listdir(path):
 
@@ -54,5 +55,4 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
             data = pd.read_csv(f'{path}{os.sep}{file}')
 
         data = data.dropna()
-        data.rename(columns=col_dict, inplace=True)
         data.to_sql(name, con=db.engine, if_exists="replace")
