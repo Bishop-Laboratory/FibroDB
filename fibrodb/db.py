@@ -1,6 +1,7 @@
 import numpy
 
 from fibrodb.model import Genes, GeneAliases, GeneExp, DEGs, Samples
+from fibrodb.misc.load_data import load_to_db
 import pandas as pd
 import os
 import numpy as np
@@ -12,12 +13,47 @@ def clean_init_db(db):
     db.create_all()
 
 
-def load_db(db):
-    """Load all data into the db"""
-    load_test_data(db)  # TODO: Finish replacing with real data loading function
+def load_db(db, data_url=None):
+    """
+    Load all data into the db
+
+    Params:
+        db: database
+        data_url: string - URL to remote data; default is None (indicates that data is stored locally)
+    """
+
+    if data_url:
+        try:
+            download_data(data_url)
+        except:
+            print('[-] ERROR! Please check the URL provided!')
+
+
+    #load data
+    load_data(db) 
+
 
     # Load gene datasets
     load_gene_data(db)
+
+
+
+def download_data(url):
+    """
+    Downloads zip file from given url, unzips it and saves unzipped content to 'raw_data' dfolder within the 'misc' directory
+    """
+    from io import BytesIO
+    from urllib.request import urlopen
+    from zipfile import ZipFile
+    import os
+    zipurl = url
+    print(os.getcwd())
+    print("[+] Opening ZIP file")
+    with urlopen(zipurl) as zipresp:
+        print("[+] Reading ZIP file")
+        with ZipFile(BytesIO(zipresp.read())) as zfile:
+            print("[+] ZIP file extracted to 'data' directory")
+            zfile.extractall(f'misc{os.sep}raw_data')
 
 
 def load_gene_data(db):
@@ -358,3 +394,6 @@ def load_test_data(db):
     db.session.add(gene_exp)
     db.session.commit()
 
+
+def load_data(db, data_dir=f"fibrodb{os.sep}misc{os.sep}clean_data"):
+    load_to_db(db, data_dir)

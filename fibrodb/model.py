@@ -9,7 +9,6 @@ class Samples(db.Model):
     __tablename__ = 'samples'
     sample_id = db.Column(db.Text, primary_key=True)
     study_id = db.Column(db.Text)
-    sample_name = db.Column(db.Text)
     condition = db.Column(db.Text)
     replicate = db.Column(db.Integer)
     tissue = db.Column(db.Text)
