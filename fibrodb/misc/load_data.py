@@ -19,12 +19,12 @@ import os
 import re
 import numpy as np
 import json
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 import time
 
-from fibrodb.model import Samples, GeneExp, DEGs
+# from fibrodb.model import Samples, GeneExp, DEGs
 
-from flask import Flask
+# from flask import Flask
 
 # functions needed to munge relevant data into csv file format
 
@@ -123,7 +123,7 @@ def extract_sample_info(df, study_name, sample_names, parameter):
         #get sample-unspecific parameters for study-gene combination
         ensembl_id = df.loc[row, 'Ensembl Gene ID']
         gene_symbol = df.loc[row, 'Gene Symbol']
-        print(f"Current gene symbol: {gene_symbol}", end="\r")
+        print(f"Current ENSEMBL ID: {ensembl_id}", end="\r")
         biotype = df.loc[row, 'Biotype']
         logFC = df.loc[row, 'logFC'] if 'logFC' in cols else np.nan
         logCPM = df.loc[row, 'logCPM'] if 'logCPM' in cols else np.nan
@@ -152,7 +152,7 @@ def extract_sample_info(df, study_name, sample_names, parameter):
                 if sample_name not in data['gene_expr']:
                     data['gene_expr'][sample_name] = {}
                 if gene_symbol not in data['gene_expr'][sample_name]:
-                    data['gene_expr'][sample_name][gene_symbol] = {}
+                    data['gene_expr'][sample_name][ensembl_id] = {}
 
                 #print(sample_name, ':', column)  ##uncomment for troubleshooting
                 counter +=1
@@ -189,7 +189,7 @@ def extract_sample_info(df, study_name, sample_names, parameter):
                         data['sample_info'][sample_name]['condition'] = condition
                     if 'replicate' not in data['sample_info'][sample_name]:
                         data['sample_info'][sample_name]['replicate'] = replicate
-                    data['gene_expr'][sample_name][gene_symbol][parameter] = col_val
+                    data['gene_expr'][sample_name][ensembl_id][parameter] = col_val
                     
         # print('\n')
     
@@ -222,7 +222,7 @@ def load_sample_data(path, file_name):
 
 def info_to_db_format(study_info):
     """
-    Extracts sample information based on study informatio and saves  sample info in dictionaries 
+    Extracts sample information based on study information and saves sample info in dictionaries 
     corresponding to database tables.
 
     Params:
@@ -238,7 +238,7 @@ def info_to_db_format(study_info):
     degs = {}
     for study, study_info in study_info.items():
         degs[study] = {}
-        print(f"\n\n ------------------------- {study} -------------------------------- \n")
+        print(f"\n\n ------------------------- {study} -------------------------------- \n", end='\r')
         path = study_info['path']
         sample_names = study_info['samples']
         for file in study_info['files']:
@@ -257,12 +257,12 @@ def info_to_db_format(study_info):
                 lr = gene_info['LR']
                 pval = gene_info['pval']
                 padj = gene_info['FDR']
-                if gene_symbol not in degs[study]:
-                    degs[study][gene_symbol] = {}
-                    for deg_param_name, deg_param_value in zip(['ensembleID', 'biotype', 'logFC', 'logCPM', 'LR', 'pval', 'padj'], 
-                                                            [ensembl_ID, biotype, logFC, logCPM, lr, pval, padj]):
-                        if deg_param_name not in degs[study][gene_symbol]:
-                            degs[study][gene_symbol][deg_param_name] = deg_param_value
+                if ensembl_ID not in degs[study]:
+                    degs[study][ensembl_ID] = {}
+                    for deg_param_name, deg_param_value in zip(['biotype', 'logFC', 'logCPM', 'LR', 'pval', 'padj'], 
+                                                            [biotype, logFC, logCPM, lr, pval, padj]):
+                        if deg_param_name not in degs[study][ensembl_ID]:
+                            degs[study][ensembl_ID][deg_param_name] = deg_param_value
 
             for entry, entry_info in new_data['sample_info'].items():
                 if isinstance(entry_info, dict):
@@ -425,12 +425,12 @@ def load_to_db(db, path):
 # run script directly for testinf purposes
 if __name__ == "__main__":
 
-    # # Uncomment for re-creating csv files (e.g. from new data)
-    # data_structure = get_dir_structure(f'raw_data')
-    # study_info = extract_study_names(data_structure)
-    # samples, gene_exp, degs =  info_to_db_format(study_info)
-    # save_to_csv(samples=samples, gene_exp=gene_exp, degs=degs)
-    # print('\n')
+    # Uncomment for re-creating csv files (e.g. from new data)
+    data_structure = get_dir_structure(f'raw_data')
+    study_info = extract_study_names(data_structure)
+    samples, gene_exp, degs =  info_to_db_format(study_info)
+    save_to_csv(samples=samples, gene_exp=gene_exp, degs=degs)
+    print('\n')
 
 
     # app = Flask(__name__, instance_relative_config=True)
