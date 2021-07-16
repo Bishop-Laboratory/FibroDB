@@ -3,6 +3,14 @@ This script takes a directory with: multiple subdirectories containing RNA-Seq d
 
 Sample names are extracted from the analysis-step text file.
 Information from the text files containing RNA-Seq data, will be transformed and extracted, in order to prepare to load the relevant information into a databse.
+
+Information will be stored in .csv files as intermediary between data extraction and loading to db.
+
+Information (per entry) from csv files will be saved into lists corresponding to db tables as class objects and added and 
+committed to corresponding db table.
+
+NOTE: may refactor code later, in order to add+commit info directly without saving to .csv
+      --> function to modify to this end - info_to_db_format()
 """
 
 # imports
@@ -11,7 +19,14 @@ import os
 import re
 import numpy as np
 import json
+from flask_sqlalchemy import SQLAlchemy
+import time
 
+from fibrodb.model import Samples, GeneExp, DEGs
+
+from flask import Flask
+
+# functions needed to munge relevant data into csv file format
 
 def get_dir_structure(target_dir):
     """
@@ -139,7 +154,7 @@ def extract_sample_info(df, study_name, sample_names, parameter):
                 if gene_symbol not in data['gene_expr'][sample_name]:
                     data['gene_expr'][sample_name][gene_symbol] = {}
 
-#                 print(sample_name, ':', column)  ##uncomment for troubleshooting
+                #print(sample_name, ':', column)  ##uncomment for troubleshooting
                 counter +=1
                 try:
                     if '.' in column:
@@ -161,11 +176,11 @@ def extract_sample_info(df, study_name, sample_names, parameter):
                     condition = column 
                     replicate = 1
                     current_cond = condition
-                    print(f"EXCEPT 1 in columns {column}")
+                    print(f"EXCEPT 1 in columns {column}", end="\r")
                 except UnboundLocalError:
                     condition = column
                     replicate = 1
-                    print("EXCEPT 2")
+                    print("EXCEPT 2", end="\r")
                 col_val = df.loc[row, column]
                 if isinstance(col_val, float) or  isinstance(col_val, int):
                     # print(f"Value for sample {sample_name} - condition {column}: {col_val};\t\t\treplicate:{replicate}")
@@ -191,7 +206,6 @@ def extract_sample_info(df, study_name, sample_names, parameter):
     return data
  
 
-
 def load_sample_data(path, file_name):
     extension = file_name.split(".")[-1]
 
@@ -206,14 +220,23 @@ def load_sample_data(path, file_name):
     return df
 
 
-if __name__ == "__main__":
-    data_structure = get_dir_structure(f'data{os.sep}Fibroblast-Fibrosis')
-    sample_info = extract_study_names(data_structure)
+def info_to_db_format(study_info):
+    """
+    Extracts sample information based on study informatio and saves  sample info in dictionaries 
+    corresponding to database tables.
 
+    Params:
+        study_info: dict - dict - studies are keys; samples corresponding to each study are values (list)
+
+    Returns:
+        gene_exp: dict - contains gene expression info suitable for upload to GeneExp database table
+        samples: dict - contains sample info suitable for upload to Samples database table
+        degs: dict - contains deg info suitable for upload to Degs database table
+    """
     gene_exp = {}
     samples = {}
     degs = {}
-    for study, study_info in sample_info.items():
+    for study, study_info in study_info.items():
         degs[study] = {}
         print(f"\n\n ------------------------- {study} -------------------------------- \n")
         path = study_info['path']
@@ -248,6 +271,7 @@ if __name__ == "__main__":
                     for param, param_value in entry_info.items():
                         if param not in samples[entry]:
                             samples[entry][param] = param_value
+                    samples[entry]['study_id'] = study
 
             for sample_name, sample_data in new_data['gene_expr'].items():
                 if sample_name not in gene_exp:
@@ -258,12 +282,15 @@ if __name__ == "__main__":
                     for expr_param, expr_value in gene_data.items():
                         gene_exp[sample_name][gene][expr_param] = expr_value
 
+    return samples, gene_exp, degs
 
-    # convert dicts to dfs and save info as csv
-    
 
+def save_to_csv(samples, gene_exp, degs):
+    """
+    Saves sample information to csv files.
+    """
     samples_df = pd.DataFrame.from_dict(samples)
-    samples_df.to_csv(f'test_output_data{os.sep}samples.csv')
+    samples_df.T.to_csv(f'clean_data{os.sep}samples.csv')
 
 
     for data_dict, dict_name in zip([degs, gene_exp], ['degs', 'gene_exp']): 
@@ -274,42 +301,146 @@ if __name__ == "__main__":
                             innerKey)] = values
 
         df = pd.DataFrame.from_dict(reformed_dict, orient='index')
-        df.to_csv(f'test_output_data{os.sep}{dict_name}_nested.csv')
-        # SAMPLE 
-        # self.sampleID = sample_id
-        # self.studyID = study_id
-        # self.condition = condition
-        # self.replicate = replicate
-        # self.tissue = tissue
-        # self.timepoint = timepoint
-        # self.treatment = treatment
-        # self.study_info = study_info
-
-        # # DEGS
-        # # self.degs_id = degs_id
-        # # self.gene_id = gene_id
-        # # self.study_id = study_id
-        # # self.log2FC = log2FC
-        # # self.log2CPM = log2CPM
-        # # self.pval = pval
-        # # self.padj = padj
-        # # self.lr = lr
-
-        # EXPRESSION
-        # self.expression_id = expression_id
-        # self.gene_id = gene_id
-        # self.sample_id = sample_id
-        # self.tpm = tpm
-        # self.cpm = cpm
-        # self.rpkm = rpkm
+        df.to_csv(f'clean_data{os.sep}{dict_name}_nested.csv')
 
 
-    # print(data)
 
-    # print(df)
-    #     for i in data_structure[study]:
-    #         print(i)
-        # for path, file_list in study:
-        #     for file in file_list:
-        #         print(f"Loading data from sample: ")
-        #         load_sample_data(path, file)
+# funcions needed to extract data from csv files and to load data to db
+
+def read_csv_data(path):
+    """
+    Reads csv data into pandas DataFrame and saved information in list as table-class objects.
+    """
+    samples_ent = []
+    gene_exp_ent = []
+    degs_ent = []
+
+    for file in os.listdir(path):
+        name, ext = file.split(".")
+        if ext == "zip":
+            print(f"[!] Compressed file detected. Decompressing! (file name: {file})\n")
+            df = pd.read_csv(f'{path}{os.sep}{file}',compression='zip')
+        elif ext == "csv":
+            df = pd.read_csv(f"{path}{os.sep}{file}", header=0)
+        else:
+            print("Error! Please provide a .csv file or zipped .csv file with the extension .zip !")
+
+        # x = 100
+        if "samples" in file.lower():
+            print(f"[+] Iterating over {len(df)} entries to load into 'Samples' table...")
+            df.rename(columns={'Unnamed: 0': 'sample_id'}, inplace=True)
+            for i, row in df.iloc[:].iterrows():
+                print(f"\tCurrent entry with sample ID: {row.sample_id}", end="\r")
+                s1 = Samples(
+                        sample_id = row.sample_id,
+                        study_id = row.study_id,
+                        condition = row.condition,
+                        replicate = row.replicate
+                    )
+                samples_ent.append(s1)
+            print("\n")
+
+        elif "gene_exp" in file.lower():
+            print(f"[+] Iterating over {len(df)} entries to load into 'GeneExp' table...")
+            df.rename(columns={'Unnamed: 0': 'sample_id', 'Unnamed: 1': 'gene_id'}, inplace=True)
+            for i, row in df.iloc[:].iterrows():
+                print(f"\tCurrent entry with sample ID: {row.sample_id} and gene ID: {row.gene_id}", end="\r")
+                g1 = GeneExp(
+                    gene_id = row.gene_id,
+                    sample_id = row.sample_id,
+                    cpm = row.cpm,
+                    rpkm = row.rpkm,
+                    tpm=row.tpm
+                )
+
+                gene_exp_ent.append(g1)
+            print("\n")
+
+        elif "deg" in file.lower():
+            print(f"[+] Iterating over {len(df)} entries to load into 'DEGs' table...")
+            df.rename(columns={'Unnamed: 0': 'study_id', 'Unnamed: 1': 'gene_id'}, inplace=True)
+            for i, row in df.iloc[:].iterrows():
+                print(f"\tCurrent entry with study ID: {row.study_id} and gene ID: {row.gene_id}", end="\r")
+                d1 = DEGs(
+                    gene_id = row.gene_id,
+                    study_id = row.study_id,
+                    fc = row.logFC,
+                    pval = row.pval,
+                    padj = row.padj,
+                    sig = 1 if (row.padj < 0.05) else 0
+                )
+                degs_ent.append(d1)
+            print("\n")
+
+        else:
+            f_name = file.split(".")[0]
+            print(f"[-] DB Table named {f_name} does not exist! Please check your data.")
+
+    return samples_ent, gene_exp_ent, degs_ent
+
+
+def load_to_db(db, path):
+    """
+    Iterates over csv files in directory and loads csv data to db tables.
+    """
+
+    # create db-table object lists from csv file entries
+    t1 = time.perf_counter()
+    samples_items, gene_exp_items, degs_items = read_csv_data(path)
+    t2 = time.perf_counter()
+
+    print(f"""[+] {len(samples_items)} entries added to SAMPLES table; 
+    {len(gene_exp_items)} entries added to GeneEXP table; 
+    {len(degs_items)} entries added to DEGS table
+    TOTAL LOADING TIME: {t2-t1}s\n""")
+
+    # load info to db
+    print("[+] Adding data to corresponding database tables")
+    t1 = time.perf_counter()
+    db.session.add_all(samples_items)
+    db.session.commit()
+    t2 = time.perf_counter()
+    print(f"\tAdded and committed sample data to db within {t2-t1}s")
+
+    t1 = time.perf_counter()
+    iterator = list(range(len(gene_exp_items)))
+    l_start = 0
+    for i in iterator[::1000000]:  #add and commit gene exp data in chunks to avoid system crashing
+        db.session.add_all(gene_exp_items[l_start:i])
+        db.session.commit()
+        l_start = i
+    db.session.add_all(gene_exp_items[l_start:])
+    db.session.commit()
+    t2 = time.perf_counter()
+    print(f"\tAdded and committed gene exp data to db within {t2-t1}s")
+
+    t1 = time.perf_counter()
+    db.session.add_all(degs_items)
+    t2 = time.perf_counter()
+    print(f"\tAdded and committed degs data to db within {t2-t1}s")
+
+    print("[+] Data successfully added to corresponding database tables")
+
+
+# run script directly for testinf purposes
+if __name__ == "__main__":
+
+    # # Uncomment for re-creating csv files (e.g. from new data)
+    # data_structure = get_dir_structure(f'raw_data')
+    # study_info = extract_study_names(data_structure)
+    # samples, gene_exp, degs =  info_to_db_format(study_info)
+    # save_to_csv(samples=samples, gene_exp=gene_exp, degs=degs)
+    # print('\n')
+
+
+    # app = Flask(__name__, instance_relative_config=True)
+    # db.init_app(app)
+    # with app.app_context():
+    #     db.drop_all()
+    #     db.create_all()
+    #     tot_start = time.perf_counter()
+    #     load_to_db(db=db, path=f"clean_data")
+    #     tot_end = time.perf_counter()
+    # print(f"Total loading time: {tot_end-tot_start}")
+
+    print("No Errors Detected.")
