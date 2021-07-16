@@ -47,14 +47,6 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
 
         name, ext = file.split(".")
 
-        # TODO: Non-hardcode this
-        if "samples" in file.lower():
-            col_dict = {'Unnamed: 0': 'sample_id'}
-        elif "gene_exp" in file.lower():
-            col_dict = {'Unnamed: 0': 'sample_id', 'Unnamed: 1': 'gene_id'}
-        else:
-            col_dict = {'Unnamed: 0': 'study_id', 'Unnamed: 1': 'gene_id'}
-
         if ext != "csv":
             print(f"[!] Compressed file detected. Decompressing! (file name: {file})\n")
             data = pd.read_csv(f'{path}{os.sep}{file}', compression=ext)
