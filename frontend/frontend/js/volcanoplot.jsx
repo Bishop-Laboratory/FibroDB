@@ -2,6 +2,8 @@ import Plot from 'react-plotly.js';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@material-ui/data-grid';
+import { SERVER_BASE } from './constants';
+
 
 export default function Volcano() {
   const [originalData, setOrigin] = useState([{ "id": 1, "gene_id": "Loading", "study_id": "Loading", "pval": 0, fc: 0 }]);
@@ -14,7 +16,7 @@ export default function Volcano() {
 
 
   useEffect(() => {
-    fetch("http://localhost:5000/api-v1/deg")
+    fetch(SERVER_BASE + "deg")
       .then(res => res.json())
       .then(
         (result) => {
