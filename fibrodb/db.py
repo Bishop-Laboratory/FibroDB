@@ -42,17 +42,20 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
     """
     Iterates over csv files in directory and loads csv data to db tables.
     """
-    print("LOADIN DATA!!!")
+    print("[+] Loading data to database")
 
     for file in os.listdir(path):
 
         name, ext = file.split(".")
 
         if ext != "csv":
-            print(f"[!] Compressed file detected. Decompressing! (file name: {file})\n")
+            print(f"\t[!] Compressed file detected. Decompressing! (file name: {file})")
             data = pd.read_csv(f'{path}{os.sep}{file}', compression=ext)
         else:
+            print(f"\t[+] Loading data from file named: {file})")
             data = pd.read_csv(f'{path}{os.sep}{file}')
+
+    print("[+] All data successfully loaded to DB!")
 
         data = data.dropna()
         data.to_sql(name, con=db.engine, if_exists="replace")
