@@ -11,9 +11,10 @@ class Samples(db.Model):
     study_id = db.Column(db.Text)
     condition = db.Column(db.Text)
     replicate = db.Column(db.Integer)
-    tissue = db.Column(db.Text)
-    time = db.Column(db.Text)
-    treatment = db.Column(db.Text)
+    ##TODO: copy replicate information to fill following 3 rows using treatment info; or ask scientists to provide this as additional information 
+    # tissue = db.Column(db.Text)
+    # time = db.Column(db.Text)
+    # treatment = db.Column(db.Text)
 
 
 class SamplesSchema(ma.SQLAlchemyAutoSchema):
@@ -49,10 +50,8 @@ class GeneAliasesSchema(ma.SQLAlchemyAutoSchema):
 
 class GeneExp(db.Model):
     __tablename__ = 'gene_exp'
-    expression_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    gene_id = db.Column(db.Text, db.ForeignKey('genes.gene_id'), nullable=False)
-    sample_id = db.Column(db.Text, db.ForeignKey('samples.study_id'), nullable=False)
-    raw_counts = db.Column(db.Integer)
+    gene_id = db.Column(db.Text, db.ForeignKey('genes.gene_id'), nullable=False, primary_key=True)
+    sample_id = db.Column(db.Text, db.ForeignKey('samples.study_id'), nullable=False, primary_key=True)
     # db.DECIMAL(asdecimal=False) from here:
     # https://medium.com/@erdoganyesil/python-typeerror-object-of-type-decimal-is-not-json-serializable-2af216af0390
     cpm = db.Column(db.DECIMAL(asdecimal=False))
@@ -68,9 +67,8 @@ class GeneExpSchema(ma.SQLAlchemyAutoSchema):
 
 class DEGs(db.Model):
     __tablename__ = 'degs'
-    deg_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    gene_id = db.Column(db.Text, db.ForeignKey('genes.gene_id'), nullable=False)
-    study_id = db.Column(db.Text, db.ForeignKey('samples.study_id'), nullable=False)
+    gene_id = db.Column(db.Text, db.ForeignKey('genes.gene_id'), nullable=False, primary_key=True)
+    study_id = db.Column(db.Text, db.ForeignKey('samples.study_id'), nullable=False, primary_key=True)
     # db.DECIMAL(asdecimal=False) from here:
     # https://medium.com/@erdoganyesil/python-typeerror-object-of-type-decimal-is-not-json-serializable-2af216af0390
     fc = db.Column(db.DECIMAL(asdecimal=False))
