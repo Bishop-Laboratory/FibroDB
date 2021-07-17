@@ -55,7 +55,7 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
             print(f"\t[+] Loading data from file named: {file})")
             data = pd.read_csv(f'{path}{os.sep}{file}')
 
-    print("[+] All data successfully loaded to DB!")
-
         data = data.dropna()
         data.to_sql(name, con=db.engine, if_exists="replace")
+
+    print("[+] All data successfully loaded to DB!")
