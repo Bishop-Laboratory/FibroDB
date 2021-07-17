@@ -76,7 +76,6 @@ def test_samples_1(client):
     assert {'SRR11614730', 'SRR11614731', 'SRR11614733'}.issubset(samps)
 
 
-
 def test_samples_2(client):
     """Test samples endpoint. Query by Sample ID and Gene ID"""
     response = client.get('/api-v1/samples?study_id=GSE149413&replicate=1')

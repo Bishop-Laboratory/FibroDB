@@ -11,7 +11,8 @@ class Samples(db.Model):
     study_id = db.Column(db.Text)
     condition = db.Column(db.Text)
     replicate = db.Column(db.Integer)
-    ##TODO: copy replicate information to fill following 3 rows using treatment info; or ask scientists to provide this as additional information 
+    # TODO: copy replicate information to fill following 3 rows using treatment info; or ask scientists to
+    # TODO: provide this as additional information
     # tissue = db.Column(db.Text)
     # time = db.Column(db.Text)
     # treatment = db.Column(db.Text)
