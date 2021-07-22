@@ -27,8 +27,11 @@ def create_app(test_config=None):
     # Clean the database and load it
     from fibrodb.db import clean_init_db, load_db
     with app.app_context():
-        clean_init_db(db)
-        load_db(db)
+        constr = app.config["SQLALCHEMY_DATABASE_URI"]
+        if not os.path.exists(constr.replace("sqlite:///", "fibrodb/")):
+            clean_init_db(db)
+            load_db(db)
+
         ma.init_app(app)
 
     # Import the webui blueprint
