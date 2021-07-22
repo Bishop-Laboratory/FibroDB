@@ -1,4 +1,4 @@
-,condition,replicate,study_id
+sample_id,condition,replicate,study_id
 SRR8249114,Baseline,1,GSE123018
 SRR8249115,Baseline,2,GSE123018
 SRR8249116,Baseline,3,GSE123018
