@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import  { Redirect } from 'react-router-dom';
 import { SERVER_BASE } from './constants';
+import Grid from '@material-ui/core/Grid';
 import { useHistory } from "react-router-dom";
 
 export default function SearchForm() {
@@ -17,6 +18,7 @@ export default function SearchForm() {
     const [inputValue, setInputValue] = React.useState('');
     const [Value, setValue] = React.useState('');
     const [geneoptions, setOptions] = useState([]);
+    const [optionlabels, setLabels] = useState([]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -24,6 +26,30 @@ export default function SearchForm() {
         history.push('/genes/'+inputValue);
     }
     
+
+    useEffect(() => {
+      fetch(SERVER_BASE + "gene-aliases?alias_symbol="+inputValue)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          for(let i = 0; i < result.length; i++) {
+            fetch(SERVER_BASE + "gene-info?gene_id=" + result[i]["gene_id"])
+            .then(res => res.json())
+            .then(
+              (result2) => {  
+                result[i].name = result2[0].gene_symbol + " (" + result2[0].description + ")";
+                setOptions(geneoptions => [...geneoptions, {...result[i]}]);
+              }
+            )
+          }
+          setIsLoaded(true);
+        },
+        (error) => {
+          setIsLoaded(true);
+        }
+      );
+    }, [inputValue]);
+
 
     return <div>
         <form onSubmit={handleSubmit}>
@@ -36,29 +62,21 @@ export default function SearchForm() {
       value={Value}
       getOptionLabel={(option) => option.gene_id}
 
+      renderOption={(option) => { console.log("option", option.name, option); return (<Grid container alignItems="center">
+        {option.name}
+      </Grid>);}}
+
       filterOptions={x => x}
       onChange={(event, newValue) => {
         setValue(newValue);
 
       }}
+
       onInputChange={(event, newInputValue) => {
         event.preventDefault();
+        setOptions([]);
         setInputValue(newInputValue);
-        fetch(SERVER_BASE + "gene-aliases?alias_symbol="+newInputValue)
-              .then(res => res.json())
-              .then(
-                (result) => {
-                  setIsLoaded(true);
-                  setOptions(result);
-                  console.log(result);
-                },
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
-                (error) => {
-                  setIsLoaded(true);
-                }
-              );
+        setIsLoaded(false);
       }}
       inputValue={inputValue}
 
