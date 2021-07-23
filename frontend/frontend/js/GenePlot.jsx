@@ -86,6 +86,29 @@ id="demo-simple-select"
 }
 
 
+export const GenePlotSet = ({genename}) =>  {
+  const [localData, setData] = useState([]);
+
+  useEffect(() => {
+    fetch(SERVER_BASE + "gene-info?gene_symbol="+genename)
+    .then(res => res.json())
+    .then((result) => {
+      let localArray = [];
+      for(let i = 0; i < result.length; i++) {
+        console.log(result[i]);
+        localArray.push(result[i]["gene_id"]);
+      }
+      setData(localArray);
+    })
+  }, []);
+  return <div>
+    {
+      localData.map((elem) => <GenePlot genename={elem}/>)
+    }
+  </div>
+}
+
+
 export default function GenePlot(genename) {
   const [localData, setData] = useState({});
   const [localStudies, setStudies] = useState([]);
