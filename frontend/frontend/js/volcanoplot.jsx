@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { SERVER_BASE } from './constants';
-
+import { GenericForm } from './GenePlot';
 
 export default function Volcano() {
   const [originalData, setOrigin] = useState([{ "id": 1, "gene_id": "Loading", "study_id": "Loading", "pval": 0, fc: 0 }]);
@@ -11,7 +11,7 @@ export default function Volcano() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentItem, setItem] = useState("");
-
+  const [studiesChoice, setChoice] = useState([]);
 
 
 
@@ -20,21 +20,22 @@ export default function Volcano() {
       .then(res => res.json())
       .then(
         (result) => {
-          setIsLoaded(true);
-          console.log("Got Data");
-          console.log(result);
+          
           result.forEach(function (element, index) {
             element.id = index;
           });
           setOrigin(result);
 
+
           const result2 = {
             'FC': result.map(elem => elem['fc']),
             'logP': result.map(elem => -1 * Math.log(elem['pval'])),
-            'Gene Symbol': result.map(elem => elem['gene_id'])
+            'Gene Symbol': result.map(elem => elem['gene_id']),
+            'Study Id': result.map(elem => elem['study_id'])
           }
           console.log(result2);
           setData(result2);
+          setIsLoaded(true);
         },
         (error) => {
           setIsLoaded(true);
@@ -47,18 +48,21 @@ export default function Volcano() {
     {
       currentItem != "" ? <h1>Selected Gene: {currentItem}</h1> : <div />
     }
-    {isLoaded ? <div><Plot
+    {isLoaded ? <div>
+      <GenericForm isMulti={true} inputLabel="Studies" forminputs={[
+"GSE149413", "GSE97829"]} handleFormChange={setChoice} />
+      <Plot
       data={[
         {
-          x: localData.FC,
-          y: localData.logP,
+          x: localData.FC.filter((elem, index) =>  studiesChoice.includes(localData["Study Id"][index])),
+          y: localData.logP.filter((elem, index) =>  studiesChoice.includes(localData["Study Id"][index])),
           type: 'scatter',
           mode: 'markers',
           text: localData["Gene Symbol"],
           marker: { color: 'red' },
         },
       ]}
-      layout={{ width: 1000, height: 1000, title: 'Test Volcano' }}
+      layout={{ width: 1000, height: 1000, title: 'Volcano Plot' }}
 
       onClick={(e) => { console.log("onClick", e.points[0].text); setItem(e.points[0].text); setOrigin(
         [...originalData.filter(item => item["gene_id"] === e.points[0].text), 
@@ -66,7 +70,7 @@ export default function Volcano() {
       ]
       );}}
       onHover={(e) => console.log("onHover", e.points[0].text)}
-      /><TableView tabledata={originalData} /></div> : <h1>Loading...</h1>}
+      /><TableView tabledata={originalData.filter((elem, index) =>  studiesChoice.includes(localData["Study Id"][index]))} /></div> : <h1>Loading...</h1>}
   </div>
 }
 
@@ -82,6 +86,6 @@ function TableView(tabledata) {
   ]
   console.log(tabledata);
   return (
-    <DataGrid rows={tabledata["tabledata"]} columns={columns} pageSize={5} />
+    <DataGrid rows={tabledata["tabledata"]} columns={columns} pageSize={10} />
   )
 }

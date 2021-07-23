@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   }));
   
 
-const GenericForm = ({inputLabel, forminputs, handleFormChange, isMulti}) => {
+export const GenericForm = ({inputLabel, forminputs, handleFormChange, isMulti}) => {
   const classes = useStyles();  
   const [open, setOpen] = useState(false);
   const [localState, setLocal] = useState('');
