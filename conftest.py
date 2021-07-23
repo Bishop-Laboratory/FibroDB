@@ -11,15 +11,9 @@ def client():
     app = create_app(test_config={
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': test_db,
-        "SQLALCHEMY_TRACK_MODIFICATIONS": True
+        "SQLALCHEMY_TRACK_MODIFICATIONS": True,
+        "FORCE_DB": True
     })
 
     with app.test_client() as client:
-        with app.app_context():
-            db.init_app(app)
-            constr = app.config["SQLALCHEMY_DATABASE_URI"]
-            if not os.path.exists(constr.replace("sqlite:///", "fibrodb/")):
-                clean_init_db(db)
-                load_db(db)
-
         yield client
