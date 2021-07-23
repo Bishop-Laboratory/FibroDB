@@ -5,14 +5,17 @@ import { DataGrid } from '@material-ui/data-grid';
 import { SERVER_BASE } from './constants';
 import { GenericForm } from './GenePlot';
 
+
+const studies = ["GSE149413", "GSE97829"];
+
 export default function Volcano() {
   const [originalData, setOrigin] = useState([{ "id": 1, "gene_id": "Loading", "study_id": "Loading", "pval": 0, fc: 0 }]);
-  const [localData, setData] = useState({});
+  const [localData, setData] = useState([]);
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentItem, setItem] = useState("");
-  const [studiesChoice, setChoice] = useState([]);
-
+  const [studiesChoice, setChoice] = useState(null);
+  
 
 
   useEffect(() => {
@@ -24,7 +27,7 @@ export default function Volcano() {
           result.forEach(function (element, index) {
             element.id = index;
           });
-          setOrigin(result);
+          
 
 
           const result2 = {
@@ -33,8 +36,38 @@ export default function Volcano() {
             'Gene Symbol': result.map(elem => elem['gene_id']),
             'Study Id': result.map(elem => elem['study_id'])
           }
-          console.log(result2);
-          setData(result2);
+
+          let localArray = [];
+          for(let i = 0; i < studies.length; i++) {
+            localArray.push({
+              'FC': result2.FC.filter((val, index) => result2["Study Id"][index] === studies[i]),
+              'logP': result2.logP.filter((val, index) => result2["Study Id"][index] === studies[i]),
+              'Gene Symbol': result2["Gene Symbol"].filter((val, index) => result2["Study Id"][index] === studies[i]),
+            });
+          }
+
+          console.log(localArray);
+          setData(localArray);
+          
+          result = result.sort(function(a,b){ if (a["gene_id"] < b["gene_id"]) return -1;
+          if (a["gene_id"] > b["gene_id"]) return 1;
+          return 0;})
+
+          console.log(result.slice(0,2));
+          let processedArray = [];
+
+          for(let i= 0; i<result.length; i = i +2){
+            processedArray.push({
+              id: i,
+              gene_id : result[i]["gene_id"],
+              pval0: result[i]["study_id"] == studies[0] ? result[i]["pval"] : result[i+1]["pval"],
+              pval1: result[i]["study_id"] == studies[1] ? result[i]["pval"] : result[i+1]["pval"],
+              fc0: result[i]["study_id"] == studies[0] ? result[i]["fc"] : result[i+1]["fc"],
+              fc1: result[i]["study_id"] == studies[1] ? result[i]["fc"] : result[i+1]["fc"]
+            });
+          }
+
+          setOrigin(processedArray);
           setIsLoaded(true);
         },
         (error) => {
@@ -49,19 +82,19 @@ export default function Volcano() {
       currentItem != "" ? <h1>Selected Gene: {currentItem}</h1> : <div />
     }
     {isLoaded ? <div>
-      <GenericForm isMulti={true} inputLabel="Studies" forminputs={[
-"GSE149413", "GSE97829"]} handleFormChange={setChoice} />
+      <GenericForm isMulti={false} inputLabel="Studies" forminputs={studies} handleFormChange={setChoice} />
       <Plot
-      data={[
-        {
-          x: localData.FC.filter((elem, index) =>  studiesChoice.includes(localData["Study Id"][index])),
-          y: localData.logP.filter((elem, index) =>  studiesChoice.includes(localData["Study Id"][index])),
+      data={studies.map((studychoice,index) => 
+        { return ({
+          x: localData[index].FC,
+          y: localData[index].logP,
           type: 'scatter',
           mode: 'markers',
-          text: localData["Gene Symbol"],
-          marker: { color: 'red' },
-        },
-      ]}
+          name: studychoice,
+          text: localData[index]["Gene Symbol"],
+          marker: { color: studychoice === studies[0] ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255,0.5)' }
+        })
+        }).filter((elem, index) => studiesChoice ? studies[index] == studiesChoice : true)}
       layout={{ width: 1000, height: 1000, title: 'Volcano Plot' }}
 
       onClick={(e) => { console.log("onClick", e.points[0].text); setItem(e.points[0].text); setOrigin(
@@ -70,7 +103,7 @@ export default function Volcano() {
       ]
       );}}
       onHover={(e) => console.log("onHover", e.points[0].text)}
-      /><TableView tabledata={originalData.filter((elem, index) =>  studiesChoice.includes(localData["Study Id"][index]))} /></div> : <h1>Loading...</h1>}
+      /><TableView tabledata={originalData} /></div> : <h1>Loading...</h1>}
   </div>
 }
 
@@ -78,11 +111,14 @@ export default function Volcano() {
 function TableView(tabledata) {
   const columns = [
     { field: 'gene_id', headerName: 'Gene ID', width: 300 },
-    { field: 'study_id', headerName: 'Study ID', width: 300 },
-    { field: 'pval', headerName: 'p Value', width: 300 },
+    { field: 'pval0', headerName: 'p Value for ' + studies[0], width: 300 },
     {
-      field: "fc", headerName: "fold change", width: 300
-    }
+      field: "fc0", headerName: "fold change for " + studies[0], width: 300
+    },
+    { field: 'pval1', headerName: 'p Value for ' + studies[1], width: 300 },
+    {
+      field: "fc1", headerName: "fold change for " + studies[1], width: 300
+    },
   ]
   console.log(tabledata);
   return (
