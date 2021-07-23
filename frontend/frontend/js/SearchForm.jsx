@@ -51,6 +51,8 @@ export default function SearchForm() {
     }, [inputValue]);
 
 
+
+
     return <div>
         <form onSubmit={handleSubmit}>
         <Autocomplete
@@ -60,7 +62,7 @@ export default function SearchForm() {
       autoHighlight
 
       value={Value}
-      getOptionLabel={(option) => option.gene_id}
+      getOptionLabel={(option) => option ? option.name.split("(")[0].slice(0,-1): option.gene_id}
 
       renderOption={(option) => { console.log("option", option.name, option); return (<Grid container alignItems="center">
         {option.name}
