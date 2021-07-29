@@ -88,7 +88,7 @@ export default function Volcano() {
         { return ({
           x: localData[index].FC,
           y: localData[index].logP,
-          type: 'scatter',
+          type: 'scattergl',
           mode: 'markers',
           name: studychoice,
           text: localData[index]["Gene Symbol"],
