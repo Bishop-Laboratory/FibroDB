@@ -116,6 +116,7 @@ export default function GenePlot(genename) {
   const [yChoice, setY] = useState('cpm');
   const [studiesChoice, setChoice] = useState([]);
   const [xlabels, setLabels] = useState([]);
+  const [Groups, setGroups] = useState([]);
 
 
 
@@ -136,6 +137,7 @@ export default function GenePlot(genename) {
           }
           result2["study_id"] = [];
           let labels = [];
+          let groups = [];
           fetch(SERVER_BASE + "samples")
             .then(res => res.json())
             .then(
@@ -146,10 +148,12 @@ export default function GenePlot(genename) {
                       result2["study_id"].push(result[j]["study_id"]);
                       console.log(result[j]["condition"]+  " replicate " + result[j]["replicate"]);
                       labels.push(result[j]["condition"]+  " replicate " + result[j]["replicate"]);
+                      groups.push(result[j]["replicate"]);
                     }
                   }
                 }
                 setLabels(labels);
+                setGroups(groups);
                 setStudies(result2["study_id"]);
                 setChoice(localStudies.filter((v, i, a) => a.indexOf(v) === i));
               }
@@ -174,7 +178,7 @@ export default function GenePlot(genename) {
         {
           x: xlabels.filter((elem, index) =>  studiesChoice.includes(localStudies[index])),
           y: localData[yChoice].filter((elem, index) =>  studiesChoice.includes(localStudies[index])),
-          type: 'scatter',
+          type: 'scattergl',
           mode: 'markers',
           marker: { color: 'red' },
         },

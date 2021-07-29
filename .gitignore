@@ -19,6 +19,7 @@ build/
 .Rproj.user
 
 frontend/node_modules/
+node_modules/
 .Rproj.user
 *.Rproj
 .Rhistory
