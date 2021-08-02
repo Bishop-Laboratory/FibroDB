@@ -42,6 +42,22 @@ read_csv("fibrodb/misc/clean_data/samples.csv") %>%
   ) %>% write_csv("fibrodb/misc/snake_out/samples.csv")
 
  
+read_csv("samples.csv") %>%
+  left_join(
+    tibble(
+      "study_id" = c("GSE140523", "GSE149413", "GSE97829", "GSE123018"),
+      "stranded" = c("reverse", "reverse", "reverse", "reverse")
+    ), by = c("study_id")
+  ) %>% write_csv("samples.csv")
+  
+
+# Make the contrasts.csv
+tibble(
+  "study_id" =  c("GSE123018", "GSE149413", "GSE97829"),
+  "numerator" = c("24h", "Adventitia", "TGFb"),
+  "denominator" = c("Baseline", "Thrombus", "Control")
+) %>%
+  write_csv("misc/snake_out/contrasts.csv")
 
 
 # Data munging

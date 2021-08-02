@@ -5,7 +5,7 @@ import pandas as pd
 import math
 
 # TODO: Should be parameterized in the future
-genome_home_dir = "/home/millerh1/genomes/for_uchida/"
+genome_home_dir = "/home/millerh1/genomes/for_uchida"
 
 samplesheet = pd.read_csv("samples.csv")
 samples = samplesheet['sample_id']
@@ -38,11 +38,25 @@ def test_pe(wildcards):
 
 rule output:
     input: 
-      index=expand("star/{sample}.{ext}", sample=samples, ext=['bam.bai', 'bam']), 
-      counts=expand("counts/{sample}.{ext}", sample=samples, ext=['counts.tsv'])
+      degs="degs.csv",
+      counts="counts.csv"
+      
+      
+rule downstream:
+  input:
+    counts=expand("counts/{sample}.{ext}", sample=samples, ext=['counts.tsv']),
+    samples="samples.csv",
+    contrasts="contrasts.csv",
+    gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf"
+  conda: "envs/edger.yaml"
+  log: "logs/downstream.log"
+  output:
+    degs="degs.csv",
+    counts="counts.csv"
+  script: "scripts/downstream.R"
     
-
-rule cleanup_all:
+    
+rule cleanup_star:
   input:
       bam="star_raw/{sample}/Aligned.sortedByCoord.out.bam",
       cts="star_raw/{sample}/ReadsPerGene.out.tab"
