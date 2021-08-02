@@ -5,7 +5,7 @@ import pandas as pd
 import math
 
 # TODO: Should be parameterized in the future
-genome_home_dir = "/home/millerh1/genomes/for_uchida"
+genome_home_dir = "/home/millerh1/genomes/for_uchida/"
 
 samplesheet = pd.read_csv("samples.csv")
 samples = samplesheet['sample_id']
@@ -75,7 +75,7 @@ rule cleanup_star:
 rule star_align_reads:
   input: 
     file="fastqs_prepped/{sample}/{sample}.R1.fastq",
-    index=genome_home_dir + "/star_index/SA",
+    index=genome_home_dir + "star_index/SA",
   output: 
     bam=temp("star_raw/{sample}/Aligned.sortedByCoord.out.bam"),
     cts="star_raw/{sample}/ReadsPerGene.out.tab"
@@ -84,7 +84,7 @@ rule star_align_reads:
       # path to STAR reference genome index
       # optional parameters
       outdir="star_raw/{sample}/",
-      index=genome_home_dir + "/star_index/",
+      index=genome_home_dir + "star_index/",
       gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf",
       files=check_star_inputs
   threads: 8
@@ -121,13 +121,13 @@ rule cleanup_fq:
     
 rule star_index:
   input: 
-    fasta=genome_home_dir + "/Homo_sapiens.GRCh38.dna.primary_assembly.fa",
+    fasta=genome_home_dir + "Homo_sapiens.GRCh38.dna.primary_assembly.fa",
     gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf"
   output:
-    index=genome_home_dir + "/star_index/SA"
+    index=genome_home_dir + "star_index/SA"
   threads: 40
   params:
-    outdir=genome_home_dir + "/star_index/"
+    outdir=genome_home_dir + "star_index/"
   conda: "envs/star.yaml"
   shell: """
     STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {params.outdir} \
@@ -137,7 +137,7 @@ rule star_index:
 
 rule download_annotations:
   output: 
-    fasta=genome_home_dir + "/Homo_sapiens.GRCh38.dna.primary_assembly.fa",
+    fasta=genome_home_dir + "Homo_sapiens.GRCh38.dna.primary_assembly.fa",
     gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf"
   shell: """
     wget -O {output.fasta}.gz http://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
