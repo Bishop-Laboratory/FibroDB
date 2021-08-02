@@ -14,13 +14,12 @@ dist/
 build/
 *.egg-info/
 *test_feature*
-
+*fastq*
 *.db
 .Rproj.user
 
 frontend/node_modules/
 .Rproj.user
-*.Rproj
 .Rhistory
 
 
