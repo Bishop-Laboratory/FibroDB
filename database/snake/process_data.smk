@@ -4,10 +4,14 @@ import glob
 import pandas as pd
 import math
 
+
+## MAGIC GOES HERE ##
 # TODO: Should be parameterized in the future
 genome_home_dir = "/home/millerh1/genomes/for_uchida/"
-
 samplesheet = pd.read_csv("samples.csv")
+#####################
+
+
 samples = samplesheet['sample_id']
 paired_end = samplesheet['paired_end']
 
