@@ -100,20 +100,20 @@ export default function Volcano() {
       data={studies.map((studychoice,index) => 
         { console.log("selectedElem",currentItem);
           return ({
-          x: localData[index].FC,
-          y: localData[index].logP,
+          x: localData[studies.indexOf(studychoice)].FC,
+          y: localData[studies.indexOf(studychoice)].logP,
           type: 'scattergl',
           mode: 'markers',
           name: studychoice,
-          text: localData[index]["Gene Symbol"],
-          marker: { color: localData[index]["Gene Symbol"].map((elem) => (elem === currentItem) 
+          text: localData[studies.indexOf(studychoice)]["Gene Symbol"],
+          marker: { color: localData[studies.indexOf(studychoice)]["Gene Symbol"].map((elem) => (elem === currentItem) 
                   ? 'rgb(0,255,0,0,1)' 
                   :  (studychoice === studies[0]) 
                   ? 'rgba(255,0,0,0.1)' 
                   : 'rgba(0,0,255,0.1)')}
         })
-        }).filter((elem, index) => studiesChoice ? studies[index] == studiesChoice : true)}
-      layout={{ width: '45vw', height: '45vh', title: 'Volcano Plot' }}
+        }).filter((elem, index) => studiesChoice ? studiesChoice.includes(studies[index]) : true)}
+      layout={{ width: '45vw', height: '45vh'}}
 
       onClick={(e) => { console.log("onClick", e.points[0].text); setItem(e.points[0].text); setOrigin(
         [...originalData.filter(item => item["gene_id"] === e.points[0].text), 
