@@ -8,6 +8,7 @@ import { SERVER_BASE } from './constants';
 import Grid from '@material-ui/core/Grid';
 import { useHistory } from "react-router-dom";
 
+
 export default function SearchForm() {
     let history = useHistory();
 
@@ -17,6 +18,7 @@ export default function SearchForm() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [inputValue, setInputValue] = React.useState('');
     const [Value, setValue] = React.useState('');
+
     const [geneoptions, setOptions] = useState([]);
     const [optionlabels, setLabels] = useState([]);
 

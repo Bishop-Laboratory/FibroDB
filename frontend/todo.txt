@@ -1,5 +1,4 @@
--> Add search bar using https://codesandbox.io/embed/material-ui-table-search-demo-x3viu
--> Highlight volcano-plot upon clicking data-table row
--> Highlight data-table row upon clicking plot point
--> Make study selector check-boxes and clickable
--> Group gene-info table by replicate
+[X] -> Facet count plots vertically/horizontally
+[ ] -> Global controls for studies
+[X] -> Box Plot with Jitter instead of scatter for count plot
+[ ] -> Convert gene id to gene symbol
