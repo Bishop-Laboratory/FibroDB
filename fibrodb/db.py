@@ -45,7 +45,7 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
     print("[+] Loading data to database")
 
     for file in os.listdir(path):
-
+        print(file)
         name, ext = file.split(".")
 
         if ext != "csv":

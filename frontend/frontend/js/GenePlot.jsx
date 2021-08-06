@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
   }));
   
 
-export const GenericForm = ({inputLabel, forminputs, handleFormChange, isMulti}) => {
+
+export const GenericForm = ({inputLabel, forminputs, handleFormChange, isMulti, defaultVal}) => {
   const classes = useStyles();  
   const [open, setOpen] = useState(false);
   const [localState, setLocal] = useState('');
@@ -56,6 +57,7 @@ return <FormControl className={classes.formControl}>
   onOpen={handleOpen}
   value={localArray}
   onChange={handleChange}
+  defaultValue={forminputs}
   renderValue={(selected) => selected.join(', ')}
 >    
  {forminputs.map((elem) => <MenuItem value={elem} key={elem}>
@@ -95,7 +97,7 @@ export const GenePlotSet = ({genename}) =>  {
     .then((result) => {
       let localArray = [];
       for(let i = 0; i < result.length; i++) {
-        console.log(result[i]);
+        console.log("Fetching Data", result[i]);
         localArray.push(result[i]["gene_id"]);
       }
       setData(localArray);
@@ -103,13 +105,14 @@ export const GenePlotSet = ({genename}) =>  {
   }, []);
   return <div>
     {
-      localData.map((elem) => <GenePlot genename={elem}/>)
+      localData.map((elem) => <GenePlot key={elem} genename={elem} displayname={genename}/>)
     }
   </div>
 }
 
 
-export default function GenePlot(genename) {
+export default function GenePlot({genename, displayname}) {
+ 
   const [localData, setData] = useState({});
   const [localStudies, setStudies] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -118,15 +121,13 @@ export default function GenePlot(genename) {
   const [xlabels, setLabels] = useState([]);
   const [Groups, setGroups] = useState([]);
 
-
-
-  genename = genename["genename"];
+  useEffect(() => {console.log("genename", genename);}, [genename]);
+  useEffect(() => {console.log("studiesChoice", studiesChoice);}, [studiesChoice]);
   useEffect(() => {
     fetch(SERVER_BASE + "expression?gene_id="+genename)
       .then(res => res.json())
       .then(
-        (result) => {
-          
+        (result) => {      
 
           const result2 = {
             'cpm': result.map(elem => elem['cpm']),
@@ -148,7 +149,7 @@ export default function GenePlot(genename) {
                       result2["study_id"].push(result[j]["study_id"]);
                       console.log(result[j]["condition"]+  " replicate " + result[j]["replicate"]);
                       labels.push(result[j]["condition"]+  " replicate " + result[j]["replicate"]);
-                      groups.push(result[j]["replicate"]);
+                      groups.push(result[j]["condition"]);
                     }
                   }
                 }
@@ -160,31 +161,125 @@ export default function GenePlot(genename) {
         ,()=>{});
         setData(result2);
         setIsLoaded(true);
-            },
+        },
         (error) => {
-          setIsLoaded(true);
+          setIsLoaded(false);
           console.log(error);
         }
       )
-  }, []);
+  }, [genename]);
+
+  console.log("Groups",Groups);
 
   return <div>
-    {console.log(studiesChoice.length === 0, studiesChoice === [])}
+    
     {isLoaded ? <div>
         <GenericForm isMulti={false} inputLabel="Count Type" forminputs={["cpm", "tpm", "rpkm"]} handleFormChange={setY} />
-        <GenericForm isMulti={true} inputLabel="Studies" forminputs={localStudies.filter((v, i, a) => a.indexOf(v) === i)} handleFormChange={setChoice} />
-        <Plot
-      data={[
-        {
-          x: xlabels.filter((elem, index) =>  studiesChoice.includes(localStudies[index])),
-          y: localData[yChoice].filter((elem, index) =>  studiesChoice.includes(localStudies[index])),
-          type: 'scattergl',
-          mode: 'markers',
-          marker: { color: 'red' },
-        },
-      ]}
-      layout={{ width: 1000, height: 300, title: 'Gene Plot for '+genename, yaxis:{title:yChoice}}}
-      />
+        <GenericForm isMulti={true} inputLabel="Studies" forminputs={localStudies.filter((v, i, a) => a.indexOf(v) === i)} handleFormChange={setChoice} />        
+        <h1>{'Gene Plot for '+displayname}</h1>
+        {studiesChoice.map((choice, idx) => 
+        <Plot 
+        key={idx}
+        data={[
+          {
+            x: Groups.filter((elem, index) =>  localStudies[index] == choice),
+            y: localData[yChoice].filter((elem, index) =>  localStudies[index] == choice),
+            type: 'box',
+            boxpoints: "all",
+            jitter: 0.3,
+            mode: 'markers',
+            marker: { color: 'red' },
+          },
+        ]}
+        layout={{ width: 1000, height: 300, title: choice, yaxis:{title:yChoice}}}
+
+        />
+        )}
       </div> : <h1>Loading...</h1>}
+  </div>
+}
+
+
+export function GenePlotRaw({genename, displayname, studiesChoice}) {
+ 
+  const [localData, setData] = useState({});
+  const [localStudies, setStudies] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [yChoice, setY] = useState('cpm');
+  const [xlabels, setLabels] = useState([]);
+  const [Groups, setGroups] = useState([]);
+
+
+  useEffect(() => {
+    fetch(SERVER_BASE + "expression?gene_id="+genename)
+      .then(res => res.json())
+      .then(
+        (result) => {      
+
+          const result2 = {
+            'cpm': result.map(elem => elem['cpm']),
+            'rpkm': result.map(elem => elem['rpkm']),
+            'tpm': result.map(elem => elem['tpm']),
+            'gene_id': result.map(elem => elem['gene_id']),
+            'sample_id': result.map(elem => elem['sample_id'])
+          }
+          result2["study_id"] = [];
+          let labels = [];
+          let groups = [];
+          fetch(SERVER_BASE + "samples")
+            .then(res => res.json())
+            .then(
+              (result) => {
+                for (let i = 0; i <  result2['sample_id'].length; i++) {
+                  for (let j = 0; j < result.length; j++) {
+                    if(result2['sample_id'][i] == result[j]["sample_id"]) {
+                      result2["study_id"].push(result[j]["study_id"]);
+                      console.log(result[j]["condition"]+  " replicate " + result[j]["replicate"]);
+                      labels.push(result[j]["condition"]+  " replicate " + result[j]["replicate"]);
+                      groups.push(result[j]["condition"]);
+                    }
+                  }
+                }
+                setLabels(labels);
+                setGroups(groups);
+                setStudies(result2["study_id"]);
+              }
+        ,()=>{});
+        setData(result2);
+        setIsLoaded(true);
+        },
+        (error) => {
+          setIsLoaded(false);
+          console.log(error);
+        }
+      )
+  }, [genename]);
+
+  
+
+  return <div>
+    
+    {isLoaded  & studiesChoice!= null & genename != "" & typeof genename !== 'undefined' ? <div>
+        <GenericForm isMulti={false} inputLabel="Count Type" forminputs={["cpm", "tpm", "rpkm"]} handleFormChange={setY} />      
+        <h1>{displayname ? 'Gene Plot for '+displayname : 'Gene Plot for '+ genename}</h1>
+        {studiesChoice.map((choice, idx) => 
+        <Plot 
+        key={idx}
+        data={[
+          {
+            x: Groups.filter((elem, index) =>  localStudies[index] == choice),
+            y: localData[yChoice].filter((elem, index) =>  localStudies[index] == choice),
+            type: 'box',
+            boxpoints: "all",
+            jitter: 0.3,
+            mode: 'markers',
+            marker: { color: 'red' },
+          },
+        ]}
+        layout={{ width: 1000, height: 300, title: choice, yaxis:{title:yChoice}}}
+
+        />
+        )}
+      </div> : <div></div> }
   </div>
 }
