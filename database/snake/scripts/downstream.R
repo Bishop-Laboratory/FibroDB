@@ -2,12 +2,12 @@ library(edgeR)
 library(tidyverse)
 
 if (interactive()) {
-  ## For development only ##
+  ## For development only - requires R Project File ##
   setwd(paste0(rprojroot::find_rstudio_root_file(), "/misc/snake_out/"))
   counts <- list.files("counts", full.names = TRUE)
   samples <- read_csv("samples.csv")
   contrasts <- read_csv("contrasts.csv")
-  txdb <- GenomicFeatures::makeTxDbFromGFF(file = "~/genomes/for_uchida/Homo_sapiens.GRCh38.103.gtf")
+  txdb <- GenomicFeatures::makeTxDbFromGFF(file = "~/genomes/Homo_sapiens.GRCh38.103.gtf")
   out_counts <- "counts.csv"
 } else {
   counts <- snakemake@input$counts

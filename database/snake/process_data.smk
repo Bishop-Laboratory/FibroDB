@@ -6,26 +6,30 @@ import math
 
 
 ## MAGIC GOES HERE ##
-# TODO: Should be parameterized in the future
-genome_home_dir = "/home/millerh1/genomes/for_uchida/"
-samplesheet = pd.read_csv("samples.csv")
+genome_home_dir = "~/genomes/"
+samplesfile = "samples.csv"
+contrastfile = "contrasts.csv"
 #####################
 
 
+# Read sample params
+samples = pd.read_csv(samplesfile)
 samples = samplesheet['sample_id']
 paired_end = samplesheet['paired_end']
 
 
 def pe_test_fastp(wildcards):
+  """For fastp rule - tests whether sample is paired-end"""
   pe = [paired_end[idx] for idx, element in enumerate(samples) if element == wildcards.sample][0]
   if pe:
-      res="--interleaved_in "
+    res="--interleaved_in "
   else:
-      res=""
+    res=""
   return res
 
 
 def check_star_inputs(wildcards):
+  """For star rule - tests whether sample is paired-end"""
   if not test_pe(wildcards):
     retlist=["fastqs_prepped/" + wildcards.sample + "/" + wildcards.sample + ".R1.fastq"]
   else:
@@ -37,20 +41,24 @@ def check_star_inputs(wildcards):
 
 
 def test_pe(wildcards):
+  """Tests whether sample is paired-end"""
   return [paired_end[idx] for idx, element in enumerate(samples) if element == wildcards.sample][0]
 
 
+########################@@@@@@@@ SNAKE - RULES @@@@@@@@#########################
+
+
 rule output:
-    input: 
-      degs="degs.csv",
-      counts="counts.csv"
+  input: 
+    degs="degs.csv",
+    counts="counts.csv"
       
       
 rule downstream:
   input:
     counts=expand("counts/{sample}.{ext}", sample=samples, ext=['counts.tsv']),
-    samples="samples.csv",
-    contrasts="contrasts.csv",
+    samples=samplesfile,
+    contrasts=contrastfile,
     gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf"
   conda: "envs/edger.yaml"
   log: "logs/downstream.log"
@@ -62,12 +70,12 @@ rule downstream:
     
 rule cleanup_star:
   input:
-      bam="star_raw/{sample}/Aligned.sortedByCoord.out.bam",
-      cts="star_raw/{sample}/ReadsPerGene.out.tab"
+    bam="star_raw/{sample}/Aligned.sortedByCoord.out.bam",
+    cts="star_raw/{sample}/ReadsPerGene.out.tab"
   output:
-      bam="star/{sample}.bam",
-      bai="star/{sample}.bam.bai",
-      cts="counts/{sample}.counts.tsv"
+    bam="star/{sample}.bam",
+    bai="star/{sample}.bam.bai",
+    cts="counts/{sample}.counts.tsv"
   conda: "envs/samtools.yaml"
   shell: """
       mv {input.bam} {output.bam}
@@ -85,12 +93,12 @@ rule star_align_reads:
     cts="star_raw/{sample}/ReadsPerGene.out.tab"
   log: "logs/star_splice/{sample}.log"
   params:
-      # path to STAR reference genome index
-      # optional parameters
-      outdir="star_raw/{sample}/",
-      index=genome_home_dir + "star_index/",
-      gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf",
-      files=check_star_inputs
+    # path to STAR reference genome index
+    # optional parameters
+    outdir="star_raw/{sample}/",
+    index=genome_home_dir + "star_index/",
+    gtf=genome_home_dir + "Homo_sapiens.GRCh38.103.gtf",
+    files=check_star_inputs
   threads: 8
   conda: "envs/star.yaml"
   shell: """
@@ -133,9 +141,12 @@ rule star_index:
   params:
     outdir=genome_home_dir + "star_index/"
   conda: "envs/star.yaml"
+  log: "logs/star_index.log"
   shell: """
+  (
     STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {params.outdir} \
     --genomeFastaFiles {input.fasta} --sjdbGTFfile {input.gtf}
+  ) &> {log}
   """
     
 
@@ -154,17 +165,20 @@ rule download_annotations:
 rule fastp:
   input: "fastqs_raw/{sample}/{sample}.fastq"
   output:
-      trimmed=temp("fastqs_trimmed/{sample}.fastq"),
-      html="QC/fastq/html/{sample}.html",
-      json="QC/fastq/json/{sample}.json"
+    trimmed=temp("fastqs_trimmed/{sample}.fastq"),
+    html="QC/fastq/html/{sample}.html",
+    json="QC/fastq/json/{sample}.json"
   conda: "envs/fastp.yaml"
   log: "logs/fastp/{sample}__fastp_pe.log"
   priority: 10
   params:
-      extra=pe_test_fastp
+    extra=pe_test_fastp
   threads: 4
   shell: """
-  (fastp -i {input} --stdout {params.extra}-w {threads} -h {output.html} -j {output.json} > {output} ) &> {log}
+  (
+    fastp -i {input} --stdout {params.extra}-w {threads} \
+    -h {output.html} -j {output.json} > {output}
+  ) &> {log}
   """
 
 
@@ -175,19 +189,27 @@ rule sra_to_fastq:
   threads: 1
   log: "logs/sra_to_fastq/{sample}__sra_to_fastq.log"
   params:
-      output_directory="sras/{sample}/",
-      fqdump="--skip-technical --defline-seq '@$ac.$si.$sg/$ri' --defline-qual '+' --split-3 "
-  shell: """(
+    output_directory="sras/{sample}/",
+    fqdump="--skip-technical --defline-seq '@$ac.$si.$sg/$ri' --defline-qual '+' --split-3 "
+  shell: """
+  (
     cd {params.output_directory}
-    fastq-dump {params.fqdump}-O ../../fastqs_raw/{wildcards.sample}/ {wildcards.sample}
+    
+    fastq-dump {params.fqdump}-O \
+    ../../fastqs_raw/{wildcards.sample}/ {wildcards.sample}
+    
     cd ../../fastqs_raw/{wildcards.sample}/
+    
     if test -f {wildcards.sample}_2.fastq; then
         echo "Paired end -- interleaving"
-        reformat.sh in1={wildcards.sample}_1.fastq in2={wildcards.sample}_2.fastq out={wildcards.sample}.fastq overwrite=true
+        reformat.sh in1={wildcards.sample}_1.fastq \
+        in2={wildcards.sample}_2.fastq out={wildcards.sample}.fastq \
+        overwrite=true
         rm {wildcards.sample}_1.fastq && rm {wildcards.sample}_2.fastq
     else
         echo "Single end -- finished!"
     fi
+    
   ) &> {log}
   """   
         
@@ -197,11 +219,11 @@ rule download_sra:
   conda: "envs/sratools.yaml"
   log: "logs/download_sra/{sample}__download_sra.log"
   params:
-      output_directory = "sras/"
+    output_directory = "sras/"
   threads: 10
   shell: """
-          (
-          cd {params.output_directory}
-          prefetch {wildcards.sample} -f yes
-          ) &> {log}
-          """
+    (
+      cd {params.output_directory}
+      prefetch {wildcards.sample} -f yes
+    ) &> {log}
+  """
