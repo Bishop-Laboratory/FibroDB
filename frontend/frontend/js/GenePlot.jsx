@@ -255,6 +255,13 @@ export function GenePlotRaw({genename, displayname, studiesChoice}) {
       )
   }, [genename]);
 
+
+  const studies2 = ["GSE149413", "GSE97829", "GSE123018", "GSE140523"];
+
+  const displaynames = ["Transcriptome profile of fibroblasts in chronic thromboembolic pulmonary hypertension", 
+                      "RNA-Seq analysis of human lung fibroblasts exposed to TGF-β",
+                      "Translational control of cardiac fibrosis (I)",
+                      "Tissue specific human fibroblast differential expression based on RNAsequencing analysis"];
   
 
   return <div>
@@ -276,7 +283,7 @@ export function GenePlotRaw({genename, displayname, studiesChoice}) {
             marker: { color: 'red' },
           },
         ]}
-        layout={{ width: 1000, height: 300, title: choice, yaxis:{title:yChoice}}}
+        layout={{ width: 1000, height: 300, title: displaynames[studies2.indexOf(choice)], yaxis:{title:yChoice}}}
 
         />
         )}
