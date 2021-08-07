@@ -14,11 +14,20 @@ dist/
 build/
 *.egg-info/
 *test_feature*
-
+*fastq*
 *.db
 .Rproj.user
 
 frontend/node_modules/
 .Rproj.user
-*.Rproj
 .Rhistory
+
+
+*.snakemake*
+misc/snake_out/sras/
+misc/snake_out/star/
+misc/snake_out/star_raw/
+misc/snake_out/fastqs_prepped/
+misc/snake_out/logs/
+misc/snake_out/QC/
+misc/snake_out/counts/
