@@ -1,0 +1,10 @@
+channels:
+  - bioconda
+  - r
+  - conda-forge
+dependencies:
+  - bioconductor-edger
+  - r-tidyverse
+  - bioconductor-genomicfeatures
+  - r-purrr
+  

@@ -23,22 +23,26 @@ def load_db(db):
 
 def load_gene_data(db):
     """Load the gene info tables into the database"""
+    
+    # Path MAGIC
+    DATA_DIR = "database/gene_data/"
+    
     # Find the gene datasets
-    files = np.array([ind if ind[-3:] == ".xz" else np.NaN for ind in os.listdir("fibrodb/misc/gene_data")])
+    files = np.array([ind if ind[-3:] == ".xz" else np.NaN for ind in os.listdir(DATA_DIR)])
     datasets = files[np.where(files != str(np.NaN))]
 
     # Load the gene info data
     if 'genes.csv.xz' in datasets:
-        genes = pd.read_csv('fibrodb/misc/gene_data/genes.csv.xz')
+        genes = pd.read_csv(DATA_DIR + 'genes.csv.xz')
         genes.to_sql(name='genes', con=db.engine, if_exists="append", index=False)
 
     # Load the gene alias data
     if 'gene_aliases.csv.xz' in datasets:
-        genes = pd.read_csv('fibrodb/misc/gene_data/gene_aliases.csv.xz')
-        genes.to_sql(name='gene_aliases', con=db.engine, if_exists="append", index=False)
+        aliases = pd.read_csv(DATA_DIR + 'gene_aliases.csv.xz')
+        aliases.to_sql(name='gene_aliases', con=db.engine, if_exists="append", index=False)
 
 
-def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
+def load_data(db, path=f"database{os.sep}fibro_data"):
     """
     Iterates over csv files in directory and loads csv data to db tables.
     """
@@ -46,8 +50,10 @@ def load_data(db, path=f"fibrodb{os.sep}misc{os.sep}clean_data"):
 
     for file in os.listdir(path):
 
-        name, ext = file.split(".")
-
+        fl = file.split(".")
+        name = fl[0]
+        ext = fl[-1]
+            
         if ext != "csv":
             print(f"\t[!] Compressed file detected. Decompressing! (file name: {file})")
             data = pd.read_csv(f'{path}{os.sep}{file}', compression=ext)
