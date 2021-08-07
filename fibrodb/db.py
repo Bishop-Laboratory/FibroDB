@@ -61,7 +61,7 @@ def load_data(db, path=f"database{os.sep}fibro_data"):
             print(f"\t[+] Loading data from file named: {file})")
             data = pd.read_csv(f'{path}{os.sep}{file}')
 
-        data = data.dropna()
+        data = data.fillna(-1)
         data.to_sql(name, con=db.engine, if_exists="replace")
 
     print("[+] All data successfully loaded to DB!")
