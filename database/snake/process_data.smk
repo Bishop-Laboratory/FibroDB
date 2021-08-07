@@ -14,8 +14,8 @@ contrastfile = "contrasts.csv"
 
 # Read sample params
 samples = pd.read_csv(samplesfile)
-samples = samplesheet['sample_id']
-paired_end = samplesheet['paired_end']
+samples = samplesfile['sample_id']
+paired_end = samplesfile['paired_end']
 
 
 def pe_test_fastp(wildcards):
@@ -51,7 +51,7 @@ def test_pe(wildcards):
 rule output:
   input: 
     degs="degs.csv",
-    counts="counts.csv"
+    counts="gene_exp.csv"
       
       
 rule downstream:
@@ -64,7 +64,7 @@ rule downstream:
   log: "logs/downstream.log"
   output:
     degs="degs.csv",
-    counts="counts.csv"
+    counts="gene_exp.csv"
   script: "scripts/downstream.R"
     
     

@@ -8,13 +8,15 @@ if (interactive()) {
   samples <- read_csv("samples.csv")
   contrasts <- read_csv("contrasts.csv")
   txdb <- GenomicFeatures::makeTxDbFromGFF(file = "~/genomes/Homo_sapiens.GRCh38.103.gtf")
-  out_counts <- "counts.csv"
+  out_counts <- "gene_exp.csv"
+  out_degs <- "degs.csv"
 } else {
   counts <- snakemake@input$counts
   samples <- read_csv(snakemake@input$samples)
   contrasts <- read_csv(snakemake@input$contrasts)
   txdb <- GenomicFeatures::makeTxDbFromGFF(file = snakemake@input$gtf)
   out_counts <- snakemake@output$counts
+  out_degs <- snakemake@output$degs
 }
 
 # Helper functions
@@ -111,6 +113,6 @@ lapply(unique(contrasts$study_id), function(study) {
     select(study_id, gene_id, fc=logFC, pval=PValue, padj=FDR, sig)
 }) %>%
   bind_rows() %>%
-  write_csv("degs.csv")
+  write_csv(out_degs)
 
 
