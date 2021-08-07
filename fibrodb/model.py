@@ -8,9 +8,8 @@ ma = Marshmallow()
 class Samples(db.Model):
     __tablename__ = 'samples'
     sample_id = db.Column(db.Text, primary_key=True)
-    study_id = db.Column(db.Text)
     condition = db.Column(db.Text)
-    replicate = db.Column(db.Integer)
+    study_id = db.Column(db.Text)
     # TODO: copy replicate information to fill following 3 rows using treatment info; or ask scientists to
     # TODO: provide this as additional information
     # tissue = db.Column(db.Text)
