@@ -4,14 +4,26 @@
   "description": "",
   "main": "frontend/js/main.jsx",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@material-ui/core": "^4.12.1",
+    "@material-ui/data-grid": "^4.0.0-alpha.33",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "axios": "^0.21.1",
+    "material-ui-search-bar": "^1.0.0",
+    "plotly": "^1.0.6",
+    "plotly.js": "^2.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "resolve-cwd": "^2.0.0"
+    "react-plotly.js": "^2.5.1",
+    "react-router-dom": "^5.2.0",
+    "resolve-cwd": "^2.0.0",
+    "styled-components": "^5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
@@ -25,7 +37,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^2.3.0",
-    "webpack": "^4.46.0",
+    "webpack": "^5.47.0",
     "webpack-cli": "^3.3.12"
   }
 }

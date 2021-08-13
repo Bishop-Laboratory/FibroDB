@@ -49,11 +49,10 @@ def load_data(db, path=f"database{os.sep}fibro_data"):
     print("[+] Loading data to database")
 
     for file in os.listdir(path):
-
         fl = file.split(".")
         name = fl[0]
         ext = fl[-1]
-            
+
         if ext != "csv":
             print(f"\t[!] Compressed file detected. Decompressing! (file name: {file})")
             data = pd.read_csv(f'{path}{os.sep}{file}', compression=ext)
