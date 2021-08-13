@@ -1,6 +1,6 @@
 export FLASK_APP=fibrodb
 export FLASK_ENV=development
-flask run
+flask run & 
 cd frontend
 export FLASK_APP=frontend
-flask run --port 5001
+flask run --port 5001 &
