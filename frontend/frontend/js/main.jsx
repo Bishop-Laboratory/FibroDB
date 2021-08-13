@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import App from "./page_router.jsx";
 
 ReactDOM.render(
   <div>
-    <p>hi</p>
+    <App></App>
   </div>,
   document.getElementById('reactEntry'),
 );

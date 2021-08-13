@@ -33,7 +33,7 @@ def create_app(test_config=None):
             load_db(db)
 
         ma.init_app(app)
-
+    print("AMMAM")
     # Import the webui blueprint
     from fibrodb import api
     app.register_blueprint(api.bp)
