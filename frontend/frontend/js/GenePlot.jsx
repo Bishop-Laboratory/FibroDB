@@ -121,6 +121,15 @@ export default function GenePlot({genename, displayname}) {
   const [xlabels, setLabels] = useState([]);
   const [Groups, setGroups] = useState([]);
 
+  const studies2 = ["GSE149413", "GSE97829", "GSE123018", "GSE140523"];
+
+  const displaynames = ["Transcriptome profile of fibroblasts in chronic thromboembolic pulmonary hypertension", 
+                      "RNA-Seq analysis of human lung fibroblasts exposed to TGF-β",
+                      "Translational control of cardiac fibrosis (I)",
+                      "Tissue specific human fibroblast differential expression based on RNAsequencing analysis"];
+  
+
+
   useEffect(() => {console.log("genename", genename);}, [genename]);
   useEffect(() => {console.log("studiesChoice", studiesChoice);}, [studiesChoice]);
   useEffect(() => {
@@ -191,7 +200,7 @@ export default function GenePlot({genename, displayname}) {
             marker: { color: 'red' },
           },
         ]}
-        layout={{ width: 1000, height: 300, title: choice, yaxis:{title:yChoice}}}
+        layout={{ width: 1000, height: 300, title: displaynames[studies2.indexOf(choice)], yaxis:{title:yChoice}}}
 
         />
         )}
