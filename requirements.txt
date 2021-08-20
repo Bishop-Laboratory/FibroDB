@@ -9,6 +9,7 @@ coverage==5.5
 Flask==2.0.1
 flask-marshmallow==0.14.0
 Flask-SQLAlchemy==2.5.1
+flask_cors
 greenlet==1.1.0
 idna==2.10
 iniconfig==1.1.1
