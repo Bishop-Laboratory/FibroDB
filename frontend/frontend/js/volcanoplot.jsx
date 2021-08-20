@@ -1,6 +1,6 @@
 import Plot from 'react-plotly.js';
 import axios from 'axios';
-import React, { useState, useEffect, Profiler, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { SERVER_BASE } from './constants';
 import GenePlot, { GenericForm, GenePlotRaw } from './GenePlot';
@@ -19,27 +19,18 @@ export default function Volcano() {
   const [localData, setData] = useState([]);
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [currentGene, setGene] = useState("");
+  const [currentItem, setItem] = useState("");
   const [studiesChoice, setChoice] = useState(null);
-  const [plotColors, setColors] = useState(Array(59453).fill("rgba(0,0,255,0.25)"));
-
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  }
-  const prevGene = usePrevious(currentGene);
+  
 
 
   function handleChange(newValue) {
-    setGene(newValue);
+    setItem(newValue);
   }
 
   useEffect(() => {
-    console.log("currentGene", currentGene);
-  }, [currentGene]);
+    console.log("CURRENTITEM", currentItem);
+  }, [currentItem]);
 
   useEffect(() => {
     fetch(SERVER_BASE + "deg")
@@ -88,8 +79,7 @@ export default function Volcano() {
               fc1: result[i]["study_id"] == studies[1] ? result[i]["fc"] : result[i+1]["fc"]
             });
           }
-          console.log(localArray[0]["Gene Symbol"]);
-          setColors(Array(localArray[0]["Gene Symbol"].length).fill("rgba(0,255,0,0.25)"));
+
           setOrigin(processedArray);
           setIsLoaded(true);
         },
@@ -100,39 +90,15 @@ export default function Volcano() {
   }, []);
 
   
-  useEffect(() => {
-    if (localData.length > 0) {
-    console.log("plotColors", plotColors);
-    let newColors = plotColors.slice();
-    let oldIndex = localData[studies.indexOf("GSE149413")]["Gene Symbol"].indexOf(prevGene);
-    let newIndex = localData[studies.indexOf("GSE149413")]["Gene Symbol"].indexOf(currentGene);
-    if (oldIndex != -1) {
-    newColors[oldIndex] = "rgba(0,0,255,0.25)";
-    }
-    if (newIndex != -1) {
-    newColors[newIndex] =  "rgba(0,255,0,0.25)";
-    }
-    console.log("newIndex and oldIndex", newIndex, oldIndex);
-    /* localData[0]["Gene Symbol"].map((elem) => (elem === currentGene) 
-    ? 'rgb(0,255,0,0,1)' 
-    :  0 
-    ? 'rgba(255,0,0,0.1)' 
-    : 'rgba(0,0,255,0.1)'); */
-    setColors(newColors);
-    console.log("newColors", newColors);
-    }
-  }
-
-  ,[currentGene, localData]);
+  
 
   return <div>
     {isLoaded ? <div style={{ display: 'flex', height: '50%'}}>
       <GenericForm isMulti={true} inputLabel="Studies" forminputs={studies} handleFormChange={setChoice} />
-      
       <Plot
-      extra={currentGene}
+      extra={currentItem}
       data={studies.map((studychoice,index) => 
-        { console.log("selectedElem",currentGene);
+        { console.log("selectedElem",currentItem);
           return ({
           x: localData[studies.indexOf(studychoice)].FC,
           y: localData[studies.indexOf(studychoice)].logP,
@@ -140,22 +106,29 @@ export default function Volcano() {
           mode: 'markers',
           name: studychoice,
           text: localData[studies.indexOf(studychoice)]["Gene Symbol"],
-          marker: { color: plotColors } 
+          marker: { color: localData[studies.indexOf(studychoice)]["Gene Symbol"].map((elem) => (elem === currentItem) 
+                  ? 'rgba(0,255,0,1)' 
+                  :  (studychoice === studies[0]) 
+                  ? 'rgba(255,0,0,0.1)' 
+                  : 'rgba(0,0,255,0.1)'),
+                  sizemin: 200,
+                  sizemax: 200
+                }
         })
         }).filter((elem, index) => studiesChoice ? studiesChoice.includes(studies[index]) : true)}
-      layout={{ width: '45vw', height: '45vh'}}
+      layout={{ width: '45vw', height: '45vh',  yaxis: {range: [0, 600]}, showlegend: false}}
 
-      onClick={(e) => { console.log("onClick", e.points[0].text); setGene(e.points[0].text); setOrigin(
+      onClick={(e) => { console.log("onClick", e.points[0].text); setItem(e.points[0].text); setOrigin(
         [...originalData.filter(item => item["gene_id"] === e.points[0].text), 
         ...originalData.filter(item => item["gene_id"] !== e.points[0].text)
       ]
       );}}
       />
-      <TableView tabledata={originalData} onChange={handleChange} selected={currentGene} /></div> : <h1>Loading...</h1>}
+      <TableView tabledata={originalData} onChange={handleChange} selected={currentItem} /></div> : <h1>Loading...</h1>}
       <br/>
       <br/>
       
-      <GenePlotRaw genename={currentGene} studiesChoice={studiesChoice ? studiesChoice : studies}/>
+      <GenePlotRaw genename={currentItem} studiesChoice={studiesChoice ? studiesChoice : studies}/>
   </div>
 }
 
