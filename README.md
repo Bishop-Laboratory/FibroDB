@@ -11,6 +11,7 @@ Flask app for exploring the fibroblast lncRNA-Seq dataset from Therkelsen et al.
 
 ```shell
 git clone https://github.com/Bishop-Laboratory/Fibroblast-lncRNASeq-explorer.git
+git lfs pull
 ```
 
 3. Set up the virtual env
