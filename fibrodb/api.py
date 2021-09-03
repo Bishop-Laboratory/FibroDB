@@ -7,9 +7,8 @@ from fibrodb.model import (
 )
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS, cross_origin
-# Init blueprint and api
+# Init blueprint and api (Need to ask Henry about this.)
 bp = Blueprint('api', __name__)
-
 # Init marshmallow schemas
 genes_schema = GenesSchema(many=True)
 gene_aliases_schema = GeneAliasesSchema(many=True)
@@ -17,6 +16,8 @@ degs_schema = DEGsSchema(many=True)
 samples_schema = SamplesSchema(many=True)
 geneexp_schema = GeneExpSchema(many=True)
 
+global full_data_cache
+full_data_cache = None
 
 @bp.route('/api-v1/gene-info', methods=('GET',))
 @cross_origin(origin='*')
@@ -46,8 +47,16 @@ def samples_api():
 @cross_origin(origin='*')
 def degs_api():
     """API resource - Query DEGs by any column"""
+    global full_data_cache
+    if request.args.to_dict() == {}:
+        if full_data_cache != None:
+            return full_data_cache
     degs = DEGs.query.filter_by(**request.args.to_dict()).all()
-    return jsonify(degs_schema.dump(degs))
+    output = degs_schema.dump(degs)
+    output = jsonify(output)
+    if request.args.to_dict() == {}:
+        full_data_cache = output
+    return  output
 
 
 @bp.route('/api-v1/expression', methods=('GET',))
@@ -56,3 +65,4 @@ def gene_exp_api():
     """API resource - Query Gene Exp by any column"""
     gene_exp = GeneExp.query.filter_by(**request.args.to_dict()).all()
     return jsonify(geneexp_schema.dump(gene_exp))
+
