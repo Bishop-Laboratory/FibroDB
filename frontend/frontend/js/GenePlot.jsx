@@ -279,6 +279,7 @@ export function GenePlotRaw({genename, displayname, studiesChoice}) {
         <GenericForm isMulti={false} inputLabel="Count Type" forminputs={["cpm", "tpm", "rpkm"]} handleFormChange={setY} />      
         <h1>{displayname ? 'Gene Plot for '+displayname : 'Gene Plot for '+ genename}</h1>
         {studiesChoice.map((choice, idx) => 
+        localData[yChoice].filter((elem, index) =>  localStudies[index] == choice).length > 0 &&
         <Plot 
         key={idx}
         data={[

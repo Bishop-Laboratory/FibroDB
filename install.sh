@@ -12,4 +12,5 @@ pip install -e .
 pip install -e frontend
 pushd frontend
 npm install
+npm run build
 popd
