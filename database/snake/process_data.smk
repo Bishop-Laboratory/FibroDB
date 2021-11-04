@@ -13,9 +13,9 @@ contrastfile = "contrasts.csv"
 
 
 # Read sample params
-samples = pd.read_csv(samplesfile)
-samples = samplesfile['sample_id']
-paired_end = samplesfile['paired_end']
+samplesheet = pd.read_csv(samplesfile)
+samples = samplesheet['sample_id']
+paired_end = samplesheet['paired_end']
 
 
 def pe_test_fastp(wildcards):
