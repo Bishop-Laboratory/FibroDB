@@ -1,4 +1,0 @@
-[X] -> Facet count plots vertically/horizontally
-[X] -> Global controls for studies
-[X] -> Box Plot with Jitter instead of scatter for count plot
-[\_/] -> Convert gene id to gene symbol
