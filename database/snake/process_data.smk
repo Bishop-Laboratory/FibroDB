@@ -51,7 +51,7 @@ def test_pe(wildcards):
 rule output:
   input: 
     degs="degs.csv",
-    counts="counts.csv"
+    counts="gene_exp.csv"
       
       
 rule downstream:
@@ -64,7 +64,7 @@ rule downstream:
   log: "logs/downstream.log"
   output:
     degs="degs.csv",
-    counts="counts.csv"
+    counts="gene_exp.csv"
   script: "scripts/downstream.R"
     
     
