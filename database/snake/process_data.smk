@@ -13,7 +13,7 @@ contrastfile = "contrasts.csv"
 
 
 # Read sample params
-samples = pd.read_csv(samplesfile)
+samplesheet = pd.read_csv(samplesfile)
 samples = samplesheet['sample_id']
 paired_end = samplesheet['paired_end']
 
