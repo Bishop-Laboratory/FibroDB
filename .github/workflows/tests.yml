@@ -36,6 +36,7 @@ jobs:
       - name: Other dependencies & run tests
         run: |
           conda activate fibrodb
+           R -e "install.packages(c('prompter'), repos='http://cran.us.r-project.org')"
           echo "Attempting to launch app for 120 seconds..."
           timeout 120 Rscript runApp.R || code=$?; if [[ $code -ne 124 && $code -ne 0 ]]; then exit $code; fi
           # echo "Attempted to launch tests at seed 1234"
