@@ -22,13 +22,15 @@ frontend/node_modules/
 node_modules/
 .Rproj.user
 .Rhistory
-
+fibrodb-data/
 
 *.snakemake*
-misc/snake_out/sras/
-misc/snake_out/star/
-misc/snake_out/star_raw/
-misc/snake_out/fastqs_prepped/
-misc/snake_out/logs/
-misc/snake_out/QC/
-misc/snake_out/counts/
+*.xz
+preprocess/snake/sras/
+preprocess/snake/star/
+preprocess/snake/star_raw/
+preprocess/snake/fastqs_prepped/
+preprocess/snake/logs/
+preprocess/snake/QC/
+preprocess/snake/counts/
+

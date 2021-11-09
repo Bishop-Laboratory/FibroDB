@@ -8,8 +8,8 @@ if (interactive()) {
   samples <- read_csv("samples.csv")
   contrasts <- read_csv("contrasts.csv")
   txdb <- GenomicFeatures::makeTxDbFromGFF(file = "~/genomes/Homo_sapiens.GRCh38.103.gtf")
-  out_counts <- "gene_exp.csv"
-  out_degs <- "degs.csv"
+  out_counts <- "fibro_data/gene_exp.csv"
+  out_degs <- "fibro_data/degs.csv"
 } else {
   counts <- snakemake@input$counts
   samples <- read_csv(snakemake@input$samples)

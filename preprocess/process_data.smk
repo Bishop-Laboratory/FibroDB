@@ -5,10 +5,10 @@ import pandas as pd
 import math
 
 
-## MAGIC GOES HERE ##
+## CONST GOES HERE ##
 genome_home_dir = "~/genomes/"
-samplesfile = "samples.csv"
-contrastfile = "contrasts.csv"
+samplesfile = "fibro_data/samples.csv"
+contrastfile = "fibro_data/contrasts.csv"
 #####################
 
 
@@ -50,10 +50,16 @@ def test_pe(wildcards):
 
 rule output:
   input: 
-    degs="degs.csv",
-    counts="gene_exp.csv"
-      
-      
+    degs="fibro_data/degs.csv.xz",
+    counts="fibro_data/gene_exp.csv.xz"
+
+
+rule xz:
+  input: "{file}.csv"
+  output: "{file}.csv.xz"
+  shell: "xz {input}"
+  
+  
 rule downstream:
   input:
     counts=expand("counts/{sample}.{ext}", sample=samples, ext=['counts.tsv']),
@@ -63,8 +69,8 @@ rule downstream:
   conda: "envs/edger.yaml"
   log: "logs/downstream.log"
   output:
-    degs="degs.csv",
-    counts="gene_exp.csv"
+    degs="fibro_data/degs.csv",
+    counts="fibro_data/gene_exp.csv"
   script: "scripts/downstream.R"
     
     
