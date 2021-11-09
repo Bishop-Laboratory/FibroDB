@@ -86,6 +86,8 @@ ui <- function(request) {
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+    
+    ## Results table
     output$results <- renderDT(server = TRUE, {
         req(input$selectStudy)
         results_show %>%
@@ -105,6 +107,7 @@ server <- function(input, output, session) {
             )
     })
     
+    ## Get currently-selected gene
     current_gene <- reactive({
         # Get selected row from datatable
         selectedRow <- ifelse(is.null(input$results_rows_selected),
@@ -116,6 +119,7 @@ server <- function(input, output, session) {
             pull(gene_name)
     })
     
+    ## Count plot
     output$countplot <- renderPlotly({
         cts_sel <- input$selectCTS
         gene <- current_gene()
@@ -141,7 +145,7 @@ server <- function(input, output, session) {
         ggplotly(plt)
     }) %>% bindCache(input$selectCTS, input$selectStudy, current_gene())
     
-    
+    ## Volcano plot
     output$volcanoPlot <- renderPlot({
         gene <- current_gene()
         study <- input$selectStudy
@@ -197,9 +201,7 @@ server <- function(input, output, session) {
     ## Downloads
     output$downloadLinks <- renderDT({
         tibble(
-            File = list.files(
-                "../fibrodb-data/"
-            )
+            File = c("contrasts.csv", "degs.csv.xz", "gene_exp.csv.xz", "samples.csv")
         ) %>% 
             mutate(
                 Download = paste0(
@@ -216,7 +218,6 @@ server <- function(input, output, session) {
     
 }
 
-# TODO: Need URL cleaner
 # Run the application 
 graphics.off()
 shinyApp(ui, server, enableBookmarking = "url")

@@ -1,4 +1,4 @@
-# Fibroblast-lncRNASeq-explorer
+# FibroDB
 ![Build Status](https://github.com/Bishop-Laboratory/FibroDB/workflows/tests/badge.svg)
 
 Shiny app for exploring the fibroblast lncRNA-Seq dataset from Therkelsen et al. 2021.

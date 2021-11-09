@@ -64,8 +64,8 @@ OutputPanel_tabset <- function() {
                 Expression_panel()
             ),
             tabPanel(
-              title = "Volcano",
-              icon=icon('chart-bar'),
+              title = "Volcano plot",
+              icon=icon('burn'),
               fluidRow(
                 column(
                   width = 6,
@@ -240,7 +240,7 @@ footerHTML <- function() {
       <div class='footer-copyright text-center py-3'><span style='color:white'>FibroDB © 2021 Copyright:</span>
         <a href='http://heartlncrna.github.io/' target='_blank'>heartlncrna</a> 
         <span>&nbsp</span>
-        <a href='http://heartlncrna.github.io/' target='_blank'> 
+        <a href='https://github.com/Bishop-Laboratory/FibroDB/' target='_blank'> 
           <img src='GitHub-Mark-Light-64px.png' height='20'>
         </a>
       </div>
