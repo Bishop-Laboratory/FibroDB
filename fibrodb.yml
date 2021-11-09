@@ -12,8 +12,8 @@ dependencies:
   - r-shinytest
   - r-bslib
   - r-rcolorbrewer
-  - r-pheatmap
   - r-ggplotify
   - r-shinywidgets
   - r-shinycssloaders
+  - r-pbapply
   - awscli

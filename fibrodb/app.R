@@ -1,15 +1,12 @@
 # Libraries
 library(shiny)
 library(DT)
-library(shinyvalidate)
 library(shinyWidgets)
 library(pbapply)
 library(shinycssloaders)
 library(prompter)
-library(tippy)
 library(tidyverse)
 library(plotly)
-library(pheatmap)
 library(bslib)
 library(RColorBrewer)
 
