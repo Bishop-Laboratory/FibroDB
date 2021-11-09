@@ -16,4 +16,6 @@ dependencies:
   - r-shinywidgets
   - r-shinycssloaders
   - r-pbapply
+  - bioconductor-ensdb.hsapiens.v86
+  - bioconductor-annotationdbi
   - awscli
