@@ -1,60 +1,22 @@
 # Libraries
 library(shiny)
-library(DT)
-library(shinyWidgets)
-library(pbapply)
 library(shinycssloaders)
 library(prompter)
-library(tidyverse)
-library(plotly)
-library(bslib)
-library(RColorBrewer)
+library(dplyr)
+library(ggplot2)
 
 # Get constants
 source("utils.R")
-if (! "app_data" %in% ls()) {
-    if (! file.exists("app_data.rds")) {
-        app_data <- makeGlobalData()
-    } else {
-        app_data <- readRDS("app_data.rds")
-    }
-} 
-a_ <- list2env(app_data, envir = globalenv())
-if (! "results" %in% ls()) {
-    ens2sym <- EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86 %>%
-        AnnotationDbi::select(
-            ., AnnotationDbi::keys(.), columns = "SYMBOL"
-        ) %>% rename(gene_id=GENEID, gene_name=SYMBOL)
-    results <- full_join(
-        exp, samples
-    ) %>% 
-        full_join(
-            degs
-        ) %>%
-        full_join(
-            contrasts
-        ) %>%
-        inner_join(
-            ens2sym
-        )
-    results <- results %>%
-        relocate(gene_name) %>% 
-        arrange(padj) 
-}
-if (! "results_show" %in% ls()) {
-    results_show <- results %>%
-        select(gene_name, study_id, numerator, 
-               denominator, fc, pval, padj, sig) %>%
-        distinct(gene_name, study_id, .keep_all = TRUE) 
-}
+results <- readRDS("app_data.rds")  # from makeGlobalData()
+results_show <- results %>%
+    select(gene_name, study_id, numerator, 
+           denominator, fc, padj) %>%
+    distinct(gene_name, study_id, .keep_all = TRUE) 
 
-# source("const.R")
 source("ui_globals.R")
 GENECARDS_BASE <- "https://www.genecards.org/cgi-bin/carddisp.pl?gene="
 GEO_BASE <- "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc="
 S3_HTTPS <- "https://fibrodb-data.s3.amazonaws.com/"
-
-# source("plots.R")
 
 # Define UI for application that draws a histogram
 ui <- function(request) {
@@ -72,7 +34,7 @@ ui <- function(request) {
                          includeHTML("www/home.html"),
                      )),
             tabPanel(title = "Explore", id = "explore-tab", icon = icon('table'),
-                     ExplorePageContents()),
+                     ExplorePageContents(results)),
             tabPanel(title = "Download", id = "download-tab", icon = icon('download'),
                      DownloadPageContents()),
             tabPanel(title = "Documentation", id = "docs-tab", icon = icon('file-alt'),
@@ -88,21 +50,20 @@ ui <- function(request) {
 server <- function(input, output, session) {
     
     ## Results table
-    output$results <- renderDT(server = TRUE, {
+    output$results <- DT::renderDT(server = TRUE, {
         req(input$selectStudy)
         results_show %>%
             filter(study_id == input$selectStudy) %>%
-            select(-sig) %>%
             mutate(
                 gene_name = paste0("<a href='", paste0(GENECARDS_BASE, gene_name),
                                    "' target='_blank'>", gene_name, "</a>"),
                 study_id = paste0("<a href='", paste0(GEO_BASE, study_id), 
                                   "' target='_blank'>", study_id, "</a>")
             ) %>%
-            datatable(
+            DT::datatable(
                 selection = list(mode = "single", selected = 1),
                 rownames = FALSE, escape = FALSE,
-                colnames = c("Gene", "Study", "Numerator", "Denominator", "Fold Change (log2)", "p value", "FDR"),
+                colnames = c("Gene", "Study", "Numerator", "Denominator", "Fold Change (log2)", "FDR"),
                 options = list(pageLength = 6, scrollX = TRUE)
             )
     })
@@ -120,7 +81,7 @@ server <- function(input, output, session) {
     })
     
     ## Count plot
-    output$countplot <- renderPlotly({
+    output$countplot <- plotly::renderPlotly({
         cts_sel <- input$selectCTS
         gene <- current_gene()
         study <- input$selectStudy
@@ -142,8 +103,8 @@ server <- function(input, output, session) {
             theme_gray(base_size = 13) + 
             ggtitle(gene) +
             theme(legend.position = "none")
-        ggplotly(plt)
-    }) %>% bindCache(input$selectCTS, input$selectStudy, current_gene())
+        plotly::ggplotly(plt)
+    }) #%>% bindCache(input$selectCTS, input$selectStudy, current_gene())
     
     ## Volcano plot
     output$volcanoPlot <- renderPlot({
@@ -153,7 +114,7 @@ server <- function(input, output, session) {
             filter(
                 study_id == {{ study }}
             )
-        req(! is.na(toplt$pval[1]))
+        req(! is.na(toplt$padj[1]))
         ttl <- paste0(toplt$numerator[1], " vs. ", toplt$denominator[1])
         pltdata <- toplt %>%
             mutate(
@@ -195,13 +156,13 @@ server <- function(input, output, session) {
                 )
             ) + 
             theme(legend.position = "bottom", legend.text=element_text(size=16)) 
-    }) %>% bindCache(input$selectStudy, current_gene())
+    }) #%>% bindCache(input$selectStudy, current_gene())
     
     
     ## Downloads
-    output$downloadLinks <- renderDT({
+    output$downloadLinks <- DT::renderDT({
         tibble(
-            File = c("contrasts.csv", "degs.csv.xz", "gene_exp.csv.xz", "samples.csv")
+            File = c("contrasts.csv", "degs.csv.gz", "gene_exp.csv.gz", "samples.csv")
         ) %>% 
             mutate(
                 Download = paste0(
@@ -210,7 +171,7 @@ server <- function(input, output, session) {
                     "' target='_blank'>link</a>"
                 ) 
             ) %>%
-            datatable(
+            DT::datatable(
                 selection = list(mode = "none"),
                 rownames = FALSE, escape = FALSE, options = list(dom = 't')
             )
@@ -220,4 +181,4 @@ server <- function(input, output, session) {
 
 # Run the application 
 graphics.off()
-shinyApp(ui, server, enableBookmarking = "url")
+shinyApp(ui, server)

@@ -18,15 +18,34 @@ makeHeaders <- function(title, message, fs=1.3) {
 }
 
 
-#' Makes the global data for the app
-makeGlobalData <- function(APP_DATA) {
-    exp <- read_csv("../fibrodb-data/gene_exp.csv.xz")
-    samples <- read_csv("../fibrodb-data/samples.csv")
-    contrasts <- read_csv("../fibrodb-data/contrasts.csv")
-    degs <- read_csv("../fibrodb-data/degs.csv")
-    app_data <- list(
-        exp=exp, samples=samples, contrasts=contrasts, degs=degs
-    )
-    saveRDS(app_data, file = "app_data.rds", compress = "xz")
-    return(app_data)
-}
+#' #' Makes the global data for the app
+#' makeGlobalData <- function(APP_DATA) {
+#'     exp <- read_csv("https://fibrodb-data.s3.amazonaws.com/gene_exp.csv.gz")
+#'     samples <- read_csv("https://fibrodb-data.s3.amazonaws.com/samples.csv")
+#'     contrasts <- read_csv("https://fibrodb-data.s3.amazonaws.com/contrasts.csv")
+#'     degs <- read_csv("https://fibrodb-data.s3.amazonaws.com/degs.csv.gz")
+#'     app_data <- list(
+#'         exp=exp, samples=samples, contrasts=contrasts, degs=degs
+#'     )
+#'     ens2sym <- EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86 %>%
+#'         AnnotationDbi::select(
+#'             ., AnnotationDbi::keys(.), columns = "SYMBOL"
+#'         ) %>% rename(gene_id=GENEID, gene_name=SYMBOL)
+#'     results <- full_join(
+#'         exp, samples
+#'     ) %>% 
+#'         full_join(
+#'             degs
+#'         ) %>%
+#'         full_join(
+#'             contrasts
+#'         ) %>%
+#'         inner_join(
+#'             ens2sym
+#'         )
+#'     results <- results %>%
+#'         relocate(gene_name) %>% 
+#'         arrange(padj) 
+#'     saveRDS(results, file = "app_data.rds", compress = "xz")
+#'     return(app_data)
+#' }

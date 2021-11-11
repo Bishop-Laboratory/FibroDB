@@ -1,15 +1,14 @@
 PAGE_PLOT_WIDTH = "96%"
 PAGE_PLOT_HEIGHT = "650px"
 ANNO_PLOT_HEIGHT = "1000px"
-DEFAULT_STUDY = rev(unique(samples$study_id))[1]
 
-ExplorePageContents <- function() {
+ExplorePageContents <- function(results) {
     fluidPage(
         title = "Explore",
         fluidRow(
             column(
                 width = 6,
-                GeneTable_panel()
+                GeneTable_panel(results)
             ),
             column(
                 width = 6,
@@ -20,7 +19,7 @@ ExplorePageContents <- function() {
 }
 
 
-GeneTable_panel <- function() {
+GeneTable_panel <- function(results) {
     tagList(
         fluidRow(
             column(width = 12,
@@ -33,8 +32,8 @@ GeneTable_panel <- function() {
                 selectInput(
                     inputId = "selectStudy", 
                     label = "Study",
-                    selected = DEFAULT_STUDY,
-                    choices = rev(unique(samples$study_id))
+                    selected = unique(results$study_id)[1],
+                    choices = unique(results$study_id)
                 ),
             )
         ),
@@ -46,7 +45,7 @@ GeneTable_panel <- function() {
                     title = "Results Table ",
                     message=paste0("Fibroblast RNA-Sequencing analysis results.")
                 ),
-                withSpinner(DTOutput('results'))
+                withSpinner(DT::DTOutput('results'))
             )
         )
     )
@@ -118,7 +117,7 @@ Expression_panel <- function() {
         fluidRow(
           column(
             width = 12,
-            plotlyOutput(
+            plotly::plotlyOutput(
               outputId = "countplot", height = "500px"
             )
           )
@@ -208,7 +207,7 @@ DownloadPageContents <- function() {
       column(
         width = 12,
         shiny::markdown(md),
-        dataTableOutput('downloadLinks')
+        DT::dataTableOutput('downloadLinks')
       )
     ),
     br()
