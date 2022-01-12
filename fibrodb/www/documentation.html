@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-11-09" />
+<meta name="date" content="2022-01-11" />
 
 <title>FibroDB Documentation</title>
 
@@ -248,7 +248,7 @@ div.tocify {
 
 <h1 class="title toc-ignore"><em>FibroDB</em> Documentation</h1>
 <h3 class="subtitle">v1.0.0</h3>
-<h4 class="date">2021-11-09</h4>
+<h4 class="date">2022-01-11</h4>
 
 </div>
 
@@ -261,8 +261,8 @@ div.tocify {
 <li><p>Explore differential gene expression results</p></li>
 <li><p>Download standardized and reprocessed datasets</p></li>
 </ol>
-<div id="fibrodb-interfaces-and-descriptions" class="section level2">
-<h2>FibroDB Interfaces and descriptions</h2>
+<div id="fibrodb-interfaces" class="section level2">
+<h2>FibroDB Interfaces</h2>
 <div class="figure">
 <img src="usage_fibrodb_1.small.png" align="right" style="border: none; float: none;" width="1000" alt="" />
 <p class="caption"><strong>The ‘Results’ page interface</strong>. (<strong>A</strong>) Controls the study which is displayed. (<strong>B</strong>) The Results table which displays the results of differential gene expression analysis for each gene in the study. Selecting a row will change the output in (<strong>D</strong>). (<strong>C</strong>) Selector which controls the type of expression data displayed in <strong>D</strong>. (<strong>D</strong>) Interactive box plots showing the distribution of gene expression values across samples within each biological condition in the selected study.</p>
@@ -270,6 +270,18 @@ div.tocify {
 <div class="figure">
 <img src="usage_fibrodb_2.small.png" align="right" style="border: none; float: none;" width="1000" alt="" />
 <p class="caption"><strong>DGE volcano plots</strong>. This interface displays the results of DGE analysis as a volcano plot (highlighted). Selecting a row in the ‘Results Table’ will cause the corresponding gene to be highlighted in the volcano plot.</p>
+</div>
+<div class="figure">
+<img src="usage_fibrodb_3_small.png" align="right" style="border: none; float: none;" width="1000" alt="" />
+<p class="caption"><strong>DGE Heatmap</strong>. This interface displays the top hits from DGE analysis as a heatmap for the selected study.</p>
+</div>
+<div class="figure">
+<img src="usage_fibrodb_4_small.png" align="right" style="border: none; float: none;" width="1000" alt="" />
+<p class="caption"><strong>Pathway enrichment plot</strong>. This interface displays the top results from KEGG pathway analysis as a heatmap. A drop down is available for controlling the displayed enrichment metric. “Combined.Score” - a combination of the p value from Fisher’s exact test and z score from expected enrichment; “Odds.Ratio” - odds ratio from Fisher’s exist test; “Padj (-log10)” - Adjusted p value from enrichment analysis, log transformed. For more info, see the <a href="https://maayanlab.cloud/Enrichr/">enrichr</a> documentation.</p>
+</div>
+<div class="figure">
+<img src="usage_fibrodb_5_small.png" align="right" style="border: none; float: none;" width="1000" alt="" />
+<p class="caption"><strong>DGE Venn Diagrams</strong>. This interface displays Venn diagrams which are used to compare the results of DGE analysis from all studies. A drop down menu is used to control whether Over- or Under-expressed DEGs are compared.</p>
 </div>
 </div>
 <div id="terminology" class="section level2">

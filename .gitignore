@@ -6,6 +6,8 @@ env/
 __pycache__/
 
 
+**VennDiagram**
+
 .pytest_cache/
 .coverage
 htmlcov/

@@ -64,7 +64,7 @@ OutputPanel_tabset <- function() {
             ),
             tabPanel(
               title = "Volcano plot",
-              icon=icon('burn'),
+              icon=icon('mountain'),
               fluidRow(
                 column(
                   width = 6,
@@ -84,6 +84,21 @@ OutputPanel_tabset <- function() {
                   )
                 )
               )
+            ),
+            tabPanel(
+              title = "Heatmap",
+              icon=icon("burn"),
+              Heatmap_panel()
+            ),
+            tabPanel(
+              title = "Pathway analysis",
+              icon=icon("project-diagram"),
+              Enrich_panel()
+            ),
+            tabPanel(
+              title = "Comparison",
+              icon=icon("adjust"),
+              Venn_panel()
             )
         )
     )
@@ -108,8 +123,8 @@ Expression_panel <- function() {
             width = 12,
             selectInput(
               inputId = "selectCTS",
-              choices = c("TPM", "RPKM", "CPM"),
-              selected = "TPM", 
+              choices = c("CPM", "TPM", "RPKM"),
+              selected = "CPM", 
               label = "Normalization"
             )
           )
@@ -124,6 +139,118 @@ Expression_panel <- function() {
         )
     )
 }
+
+
+Heatmap_panel <- function() {
+  list(
+    fluidRow(
+      column(
+        width = 6,
+        hr(),
+        makeHeaders(
+          title = "Heatmap ",
+          message=paste0("Heatmap of top DEG count plots for samples in the selected study.")
+        ),
+        hr()
+      )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        selectInput(
+          inputId = "selectCTS2",
+          choices = c("CPM", "TPM", "RPKM"),
+          selected = "CPM", 
+          label = "Normalization"
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        plotOutput(
+          outputId = "heatmap", height = "500px"
+        )
+      )
+    ),
+    br()
+  )
+}
+
+
+Enrich_panel <- function() {
+  list(
+    fluidRow(
+      column(
+        width = 6,
+        hr(),
+        makeHeaders(
+          title = "KEGG enrichment ",
+          message=paste0("Heatmap of top hits from KEGG pathway enrichment in over- and under-expressed genes.")
+        ),
+        hr()
+      )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        selectInput(
+          inputId = "selectCB",
+          choices = c("Combined.Score", "Odds.Ratio", "Padj (-log10)"),
+          selected = "Combined.Score", 
+          label = "Enrichment metric"
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        plotOutput(
+          outputId = "enrichPlot", height = "500px"
+        )
+      )
+    ),
+    br()
+  )
+}
+
+
+Venn_panel <- function() {
+  list(
+    fluidRow(
+      column(
+        width = 6,
+        hr(),
+        makeHeaders(
+          title = "DEG comparison ",
+          message=paste0("Venn diagram comparing over- and under-expressed genes between studies.")
+        ),
+        hr()
+      )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        selectInput(
+          inputId = "vennsel",
+          choices = c("Over-expressed", "Under-expressed"),
+          selected = "Over-expressed", 
+          label = "DEG type"
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        plotOutput(
+          outputId = "vennDiagram", height = "500px"
+        )
+      )
+    ),
+    br()
+  )
+}
+
 
 DownloadPageContents <- function() {
   md <- paste0("

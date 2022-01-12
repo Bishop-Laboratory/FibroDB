@@ -3,11 +3,41 @@ library(shiny)
 library(shinycssloaders)
 library(prompter)
 library(dplyr)
+library(tidyr)
+library(ComplexHeatmap)
+library(ggplotify)
+library(tibble)
+library(futile.logger)
 library(ggplot2)
+
+# Disable futile logger for venn
+futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
 
 # Get constants
 source("utils.R")
 results <- readRDS("app_data.rds")  # from makeGlobalData()
+eres <- readRDS("eres.rds")  # from makeGlobalData()
+
+## Correct an error where GSE149414's labels are backwards ##
+# TODO: Should probably fix this permanently when you get a chance
+results <- results %>% 
+    mutate(
+        fc = case_when(
+            study_id == "GSE149413" ~ -1 * fc, TRUE ~ fc
+        ),
+        numerator = case_when(
+            study_id == "GSE149413" ~ "Thrombus", TRUE ~ numerator
+        ),
+        denominator = case_when(
+            study_id == "GSE149413" ~ "Adventitia", TRUE ~ denominator
+        )
+    )
+eres$GSE149413 <- eres$GSE149413 %>% 
+    mutate(
+        group = ifelse(group == "Under-expressed", "Over-expressed", "Under-expressed")
+    )
+#############################################################
+
 results_show <- results %>%
     select(gene_name, study_id, numerator, 
            denominator, fc, padj) %>%
@@ -21,8 +51,15 @@ S3_HTTPS <- "https://fibrodb-data.s3.amazonaws.com/"
 # Define UI for application that draws a histogram
 ui <- function(request) {
     tagList(
-        tags$head(tags$style(HTML(headerHTML())),
-                  tags$script(src="https://kit.fontawesome.com/5071e31d65.js", crossorigin="anonymous")),
+        tags$head(
+            tags$style(HTML(headerHTML())),
+            tags$script(src="https://kit.fontawesome.com/5071e31d65.js", crossorigin="anonymous"),
+            tags$link(rel="stylesheet", type="text/css", href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.css")
+        ),
+        tags$body(
+            tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.js", `data-cfasync`="false"),
+            # tags$script(src="cookie_consent.js")  # Uncomment for cookie consent form
+        ),
         use_prompt(),
         navbarPage(
             title = "FibroDB",
@@ -158,6 +195,128 @@ server <- function(input, output, session) {
             theme(legend.position = "bottom", legend.text=element_text(size=16)) 
     }) #%>% bindCache(input$selectStudy, current_gene())
     
+    ## Heatmap
+    output$heatmap <- renderPlot({
+        study <- input$selectStudy
+        toplt <- results_show %>%
+            filter(
+                study_id == {{ study }}
+            )
+        req(! is.na(toplt$padj[1]))
+        ttl <- paste0(toplt$numerator[1], " vs. ", toplt$denominator[1])
+        g2plt <- toplt %>%
+            mutate(
+                sigcond = case_when(
+                    padj > 0.05 ~ "n.s.",
+                    abs(fc) < 1 ~ "sig-only",
+                    fc > 1 ~ "Over-expressed",
+                    fc < -1 ~ "Under-expressed"
+                )
+            ) %>%
+            filter(sigcond %in% c("Over-expressed", "Under-expressed")) %>% 
+            group_by(sigcond) %>% 
+            slice_min(
+                order_by = padj, n = 12
+            ) %>% pull(gene_name)
+        
+        cts_sel <- input$selectCTS2
+        study <- input$selectStudy
+        annot <- results
+        topvt <- results %>%
+            filter(
+                study_id == {{ study }},
+                gene_name %in% g2plt
+            ) %>% 
+            rename(
+                counts = contains(cts_sel)
+            ) 
+        annot <- topvt %>% 
+            select(sample_id, condition) %>% 
+            unique() %>% 
+            column_to_rownames("sample_id")
+        plt <- pivot_wider(  
+            data = topvt,
+            id_cols = gene_name, names_from = sample_id, values_from = counts
+        ) %>% 
+            column_to_rownames("gene_name") %>% 
+            as.matrix() %>% 
+            pheatmap(
+                scale = "row",
+                angle_col = "45",
+                annotation_col = annot,
+                name = cts_sel,
+                main = ttl
+            )
+        plt
+    }) #%>% bindCache(input$selectStudy, current_gene())
+    
+    ## enrichment plot
+    output$enrichPlot <- renderPlot({
+        study <- input$selectStudy
+        toplt <- results_show %>%
+            filter(
+                study_id == {{ study }}
+            )
+        req(! is.na(toplt$padj[1]))
+        ttl <- paste0(toplt$numerator[1], " vs. ", toplt$denominator[1])
+        
+        pltdat <- eres[[study]]
+        topick <- pltdat %>% 
+            group_by(group) %>% 
+            slice_max(Combined.Score, n = 8) %>% pull(Term)
+        colby <- input$selectCB
+        pltdat %>% 
+            filter(pltdat$Term %in% topick) %>% 
+            mutate(
+                `Padj (-log10)`=-log10(Adjusted.P.value)
+            ) %>% 
+            rename(
+                colby = contains(colby)
+            ) %>% 
+            pivot_wider(
+                id_cols = Term, names_from = group, 
+                values_from = colby,
+                values_fill = 0
+            ) %>% 
+            column_to_rownames("Term") %>% 
+            as.matrix() %>% 
+            pheatmap(
+                # scale = "col",
+                angle_col = "45",
+                name = colby,
+                main = ttl
+            )
+    })
+    
+    
+    ## Comparison
+    output$vennDiagram <- renderPlot({
+        upres <- results_show %>%
+            filter(! is.na(padj) & padj < .05 & abs(fc) > 1) %>%
+            mutate(
+                group = case_when(
+                    fc > 0 ~ "Over-expressed",
+                    TRUE ~ "Under-expressed"
+                ),
+                study_id = paste0(study_id, " - ", numerator, " vs. ", denominator)
+            ) %>% 
+            group_by(group) %>%
+            {setNames(group_split(.), group_keys(.)[[1]])} %>%
+            lapply(
+                function(x) {
+                    dd <- x %>% 
+                        group_by(study_id) %>% 
+                        {setNames(group_split(.), group_keys(.)[[1]])} %>% 
+                        lapply(pull, gene_name) %>% 
+                        VennDiagram::venn.diagram(filename = NULL, col = c("firebrick", "goldenrod", "skyblue"), margin = .1)
+                        # # UpSetR::fromList() %>% 
+                        # # UpSetR::upset(text.scale = 1.5)
+                        # make_comb_mat() %>% UpSet(column_title='asd')
+                    
+                }
+            )    
+        grid.draw(upres[[input$vennsel]])
+    })
     
     ## Downloads
     output$downloadLinks <- DT::renderDT({
