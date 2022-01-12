@@ -186,7 +186,7 @@ Enrich_panel <- function() {
         hr(),
         makeHeaders(
           title = "KEGG enrichment ",
-          message=paste0("Heatmap of top hits from KEGG pathway enrichment in over- and under-expressed genes.")
+          message=paste0("Heatmap of top hits from KEGG pathway enrichment (via 'enrichr' web service) in over- and under-expressed genes.")
         ),
         hr()
       )
@@ -322,6 +322,31 @@ DownloadPageContents <- function() {
         - The 'Reads per Kilobase of transcript, per Million mapped reads'.
       * *tpm*
         - The 'Transcripts Per Million'
+  * **enrichment_res.csv**
+    - A CSV file containing the significant KEGG pathway enrichment results from [enrichR](https://cran.r-project.org/web/packages/enrichR/vignettes/enrichR.html).
+    - Structure
+      * *study_id*
+        - Study on which enrichment was calculcated
+      * *numerator*
+        - In DGE analysis, the numerator 
+      * *denominator*
+        - In DGE analysis, the denominator
+      * *group*
+        - DEG type on which enrichment was calculated (over-expressed or under-expressed).
+      * *Term*
+        - KEGG pathway analyzed
+      * *Overlap*
+        - Proportion of genes from tested 
+      * *P.value*
+        - P value from enrichment test
+      * *Adjusted.P.value*
+        - P value adjusted for multiple testing
+      * *Odds.Ratio*
+        - Odds ratio from Fisher's exact test.
+      * *Combined.Score*
+        - Aggregate score derived from odds ratio and estimated Z score. See [enrichr documentation](https://maayanlab.cloud/Enrichr/help#background&q=4) for more details.
+      * *Genes*
+        - Genes from query dataset that were also found in tested gene set.
   </details>
   <br>
   

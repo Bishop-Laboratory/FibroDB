@@ -8,7 +8,6 @@ library(ComplexHeatmap)
 library(tibble)
 library(futile.logger)
 library(ggplot2)
-# library(BiocManager)
 # options(repos = BiocManager::repositories())
 
 # Disable futile logger for venn
@@ -40,7 +39,7 @@ eres$GSE149413 <- eres$GSE149413 %>%
 #############################################################
 
 results_show <- results %>%
-    select(gene_name, study_id, numerator, 
+    dplyr::select(gene_name, study_id, numerator, 
            denominator, fc, padj) %>%
     distinct(gene_name, study_id, .keep_all = TRUE) 
 
@@ -91,7 +90,7 @@ server <- function(input, output, session) {
     output$results <- DT::renderDT(server = TRUE, {
         req(input$selectStudy)
         results_show %>%
-            filter(study_id == input$selectStudy) %>%
+            dplyr::filter(study_id == input$selectStudy) %>%
             mutate(
                 gene_name = paste0("<a href='", paste0(GENECARDS_BASE, gene_name),
                                    "' target='_blank'>", gene_name, "</a>"),
@@ -113,7 +112,7 @@ server <- function(input, output, session) {
                               1,
                               input$results_rows_selected)
         results_show %>%
-            filter(study_id == input$selectStudy) %>%
+            dplyr::filter(study_id == input$selectStudy) %>%
             dplyr::filter(row_number() == selectedRow) %>%
             pull(gene_name)
     })
@@ -124,7 +123,7 @@ server <- function(input, output, session) {
         gene <- current_gene()
         study <- input$selectStudy
         plt <- results %>%
-            filter(
+            dplyr::filter(
                 study_id == {{ study }},
                 gene_name == {{ gene }}
             ) %>%
@@ -149,7 +148,7 @@ server <- function(input, output, session) {
         gene <- current_gene()
         study <- input$selectStudy
         toplt <- results_show %>%
-            filter(
+            dplyr::filter(
                 study_id == {{ study }}
             )
         req(! is.na(toplt$padj[1]))
@@ -200,7 +199,7 @@ server <- function(input, output, session) {
     output$heatmap <- renderPlot({
         study <- input$selectStudy
         toplt <- results_show %>%
-            filter(
+            dplyr::filter(
                 study_id == {{ study }}
             )
         req(! is.na(toplt$padj[1]))
@@ -214,7 +213,7 @@ server <- function(input, output, session) {
                     fc < -1 ~ "Under-expressed"
                 )
             ) %>%
-            filter(sigcond %in% c("Over-expressed", "Under-expressed")) %>% 
+            dplyr::filter(sigcond %in% c("Over-expressed", "Under-expressed")) %>% 
             group_by(sigcond) %>% 
             slice_min(
                 order_by = padj, n = 12
@@ -224,7 +223,7 @@ server <- function(input, output, session) {
         study <- input$selectStudy
         annot <- results
         topvt <- results %>%
-            filter(
+            dplyr::filter(
                 study_id == {{ study }},
                 gene_name %in% g2plt
             ) %>% 
@@ -232,7 +231,7 @@ server <- function(input, output, session) {
                 counts = contains(cts_sel)
             ) 
         annot <- topvt %>% 
-            select(sample_id, condition) %>% 
+            dplyr::select(sample_id, condition) %>% 
             unique() %>% 
             column_to_rownames("sample_id")
         plt <- pivot_wider(  
@@ -255,7 +254,7 @@ server <- function(input, output, session) {
     output$enrichPlot <- renderPlot({
         study <- input$selectStudy
         toplt <- results_show %>%
-            filter(
+            dplyr::filter(
                 study_id == {{ study }}
             )
         req(! is.na(toplt$padj[1]))
@@ -267,7 +266,7 @@ server <- function(input, output, session) {
             slice_max(Combined.Score, n = 8) %>% pull(Term)
         colby <- input$selectCB
         pltdat %>% 
-            filter(pltdat$Term %in% topick) %>% 
+            dplyr::filter(pltdat$Term %in% topick) %>% 
             mutate(
                 `Padj (-log10)`=-log10(Adjusted.P.value)
             ) %>% 
@@ -293,7 +292,7 @@ server <- function(input, output, session) {
     ## Comparison
     output$vennDiagram <- renderPlot({
         upres <- results_show %>%
-            filter(! is.na(padj) & padj < .05 & abs(fc) > 1) %>%
+            dplyr::filter(! is.na(padj) & padj < .05 & abs(fc) > 1) %>%
             mutate(
                 group = case_when(
                     fc > 0 ~ "Over-expressed",
@@ -322,7 +321,7 @@ server <- function(input, output, session) {
     ## Downloads
     output$downloadLinks <- DT::renderDT({
         tibble(
-            File = c("contrasts.csv", "degs.csv.gz", "gene_exp.csv.gz", "samples.csv")
+            File = c("contrasts.csv", "degs.csv.gz", "gene_exp.csv.gz", "samples.csv", "enrichment_res.csv")
         ) %>% 
             mutate(
                 Download = paste0(

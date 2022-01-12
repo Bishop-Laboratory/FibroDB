@@ -75,3 +75,39 @@ makeGlobalData <- function(APP_DATA) {
     saveRDS(results, file = "app_data.rds", compress = "xz")
     return(app_data)
 }
+
+
+
+## Create eres results link
+makeERES <- function() {
+    eres <- readRDS("eres.rds")
+    results <- readRDS("app_data.rds")
+    results <- results %>% 
+        mutate(
+            fc = case_when(
+                study_id == "GSE149413" ~ -1 * fc, TRUE ~ fc
+            ),
+            numerator = case_when(
+                study_id == "GSE149413" ~ "Thrombus", TRUE ~ numerator
+            ),
+            denominator = case_when(
+                study_id == "GSE149413" ~ "Adventitia", TRUE ~ denominator
+            )
+        )
+    eres$GSE149413 <- eres$GSE149413 %>% 
+        mutate(
+            group = ifelse(group == "Under-expressed", "Over-expressed", "Under-expressed")
+        )
+    contrasts_new <- results %>% filter(! is.na(padj)) %>% dplyr::select(study_id, numerator, denominator) %>% distinct(study_id, .keep_all = TRUE)
+    towrite <- lapply(names(eres), function(nx){
+        x <- eres[[nx]]
+        x$study_id <- nx
+        # Remove "Old" p value columns and change column order
+        dplyr::select(x, -contains("Old")) %>% 
+            dplyr::relocate(study_id, group)
+    }) %>% bind_rows() 
+    left_join(contrasts_new, towrite) %>% write_csv(file = "enrichment_res.csv")
+    system("aws s3 cp enrichment_res.csv s3://fibrodb-data/")
+    file.remove("enrichment_res.csv")
+}
+
