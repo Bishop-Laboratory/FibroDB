@@ -5,10 +5,11 @@ library(prompter)
 library(dplyr)
 library(tidyr)
 library(ComplexHeatmap)
-library(ggplotify)
 library(tibble)
 library(futile.logger)
 library(ggplot2)
+# library(BiocManager)
+# options(repos = BiocManager::repositories())
 
 # Disable futile logger for venn
 futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
