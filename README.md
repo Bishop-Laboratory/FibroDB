@@ -22,7 +22,7 @@ cd FibroDB/
 conda install -c conda-forge mamba -y
 mamba env create -f fibrodb.yml --force
 conda activate fibrodb
-R -e "install.packages('prompter')"
+R -e "install.packages('prompter', repos = 'http://cran.us.r-project.org')"
 ```
 
 3. Run the app
