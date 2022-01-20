@@ -1,4 +1,4 @@
-name: ribodb
+name: fibrodb
 channels:
   - conda-forge
   - bioconda
